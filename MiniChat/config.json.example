@@ -1,0 +1,23 @@
+{
+    "providers": {
+        "DeepSeek Flash": {
+            "api_key": "YOUR_DEEPSEEK_API_KEY",
+            "base_url": "https://api.deepseek.com",
+            "model": "deepseek-v4-flash"
+        },
+        "DeepSeek Pro": {
+            "api_key": "YOUR_DEEPSEEK_API_KEY",
+            "base_url": "https://api.deepseek.com",
+            "model": "deepseek-v4-pro"
+        },
+        "Gemini": {
+            "api_key": "YOUR_GEMINI_API_KEY",
+            "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+            "model": "gemini-3.1-flash-lite-preview"
+        }
+    },
+    "selected_provider": "DeepSeek Flash",
+    "system_prompt": "You are a helpful assistant.",
+    "max_history_pairs": 5,
+    "hotkey": "ctrl+alt+space"
+}

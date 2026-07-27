@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment & Config with Secrets
+.env
+.venv/
+env/
+venv/
+.vscode/
+.idea/
+MiniChat/config.json
+
+# Gradio temporary files
+.gradio/
+notebooks/.gradio/
+
+# Model weights & Checkpoints (Large binaries)
+*.pt
+*.pth
+*.safetensors
+*.bin
+checkpoint-1500/*.safetensors
+checkpoint-1500/*.pt
+checkpoint-1500/*.bin
+checkpoint-1500/*.pth
