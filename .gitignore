@@ -12,6 +12,9 @@ venv/
 .idea/
 MiniChat/config.json
 
+# Agent credentials (do not push)
+.agents/
+
 # Gradio temporary files
 .gradio/
 notebooks/.gradio/
@@ -25,3 +28,8 @@ checkpoint-1500/*.safetensors
 checkpoint-1500/*.pt
 checkpoint-1500/*.bin
 checkpoint-1500/*.pth
+
+# Word lock files
+~$*.docx
+~$*.doc
+~$*.xlsx
