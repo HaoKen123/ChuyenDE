@@ -29,7 +29,8 @@ checkpoint-1500/*.pt
 checkpoint-1500/*.bin
 checkpoint-1500/*.pth
 
-# Word lock files
+# Word & PDF temp files
 ~$*.docx
 ~$*.doc
 ~$*.xlsx
+*.pdf
