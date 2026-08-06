@@ -119,34 +119,49 @@ class QwenCellClassifier(nn.Module):
         x = torch.flatten(x, 1)
         return self.classifier(x)
 
-# Load classifier — thử nhiều đường dẫn khác nhau
-_THIS_DIR = Path(__file__).resolve().parent  # thư mục chứa file script (notebooks/)
-_SEARCH_PATHS = [
-    WORKING_DIR / "qwen_cell_classifier_best.pth",         # /kaggle/working hoặc cwd
-    _THIS_DIR / "qwen_cell_classifier_best.pth",            # notebooks/
-    _THIS_DIR.parent / "qwen_cell_classifier_best.pth",     # thư mục cha (d:/ChuyenDeCNTT)
-    Path("qwen_cell_classifier_best.pth"),                   # relative path
-    Path("notebooks/qwen_cell_classifier_best.pth"),         # nếu chạy từ thư mục cha
+# Load classifier models — Lê Trần Quốc Huy & Hồ Nhật Hào
+_THIS_DIR = Path(__file__).resolve().parent
+_HUY_PATHS = [
+    _THIS_DIR / "qwen_cell_classifier_best_QuocHuy.pth",
+    _THIS_DIR.parent / "qwen_cell_classifier_best_QuocHuy.pth",
+    WORKING_DIR / "qwen_cell_classifier_best_QuocHuy.pth",
+    Path("qwen_cell_classifier_best_QuocHuy.pth"),
 ]
-classifier_path = None
-for _p in _SEARCH_PATHS:
-    if _p.exists():
-        classifier_path = _p
-        break
+_HAO_PATHS = [
+    _THIS_DIR / "qwen_cell_classifier_best.pth",
+    _THIS_DIR.parent / "qwen_cell_classifier_best.pth",
+    WORKING_DIR / "qwen_cell_classifier_best.pth",
+    Path("qwen_cell_classifier_best.pth"),
+]
 
-if classifier_path:
-    try:
-        classifier = QwenCellClassifier(num_classes=12)
-        classifier.load_state_dict(torch.load(str(classifier_path), map_location=DEVICE))
-        classifier = classifier.to(DEVICE).eval()
-        print(f"✅ Loaded QwenCellClassifier từ {classifier_path}")
-    except Exception as e:
-        print(f"❌ Lỗi load QwenCellClassifier: {e}")
-        classifier = None
-else:
-    print(f"❌ KHÔNG TÌM THẤY file qwen_cell_classifier_best.pth!")
-    print(f"   Đã tìm ở: {[str(p) for p in _SEARCH_PATHS]}")
-    classifier = None
+classifier_huy = None
+classifier_hao = None
+
+for _p in _HUY_PATHS:
+    if _p.exists():
+        try:
+            m = QwenCellClassifier(num_classes=12)
+            m.load_state_dict(torch.load(str(_p), map_location=DEVICE))
+            classifier_huy = m.to(DEVICE).eval()
+            print(f"✅ Loaded Mô hình Qwen 3.5 (Lê Trần Quốc Huy) từ {_p}")
+            break
+        except Exception as e:
+            print(f"⚠️ Error loading Huy model: {e}")
+
+for _p in _HAO_PATHS:
+    if _p.exists():
+        try:
+            m = QwenCellClassifier(num_classes=12)
+            m.load_state_dict(torch.load(str(_p), map_location=DEVICE))
+            classifier_hao = m.to(DEVICE).eval()
+            print(f"✅ Loaded Mô hình Qwen 3.5 (Hồ Nhật Hào) từ {_p}")
+            break
+        except Exception as e:
+            print(f"⚠️ Error loading Hao model: {e}")
+
+# Mặc định sử dụng mô hình của Lê Trần Quốc Huy, nếu không có thì dùng Hồ Nhật Hào
+classifier = classifier_huy if classifier_huy is not None else classifier_hao
+classifier_path = _HUY_PATHS[0] if classifier_huy is not None else (_HAO_PATHS[0] if classifier_hao is not None else None)
 
 # Target layer cho CAM
 if classifier:
@@ -1435,6 +1450,17 @@ with gr.Blocks(theme=THEME, css=custom_css, title="Blood Cell AI — YOLO26 + Qw
             )
             btn_vlm_apply.click(apply_crop_coords, inputs=[img_vlm, crop_coords_vlm], outputs=img_vlm)
             btn_vlm.click(tab_vlm_analyze, inputs=[img_vlm, prompt_vlm], outputs=vlm_output)
+
+        # ─── TAB SO SÁNH MÔ HÌNH NHÓM ──────────────────────────────
+        with gr.Tab("🏆 So Sánh Mô Hình Nhóm"):
+            gr.HTML("<p style='font-family:Inter,sans-serif;font-size:0.88rem;color:#64748b;margin:0 0 16px;'>So sánh kết quả dự đoán trực tiếp giữa mô hình <strong style="color:#a78bfa;">Lê Trần Quốc Huy (Qwen 3.5 .pth)</strong>, <strong style="color:#38bdf8;">Hồ Nhật Hào</strong> và <strong style="color:#6ee7b7;">Nguyễn Quốc Vinh (Qwen 2.5-VL LoRA)</strong> trên cùng 1 ảnh đầu vào.</p>")
+            with gr.Row(equal_height=False):
+                with gr.Column(scale=1, min_width=300):
+                    img_cmp = gr.Image(label="📷 Ảnh tế bào đầu vào", type="numpy", sources=["upload", "clipboard"], height=290)
+                    btn_cmp = gr.Button("🚀 So Sánh Cả 3 Mô Hình", variant="primary")
+                with gr.Column(scale=2):
+                    cmp_output = gr.Markdown(label="Bảng so sánh chi tiết")
+            btn_cmp.click(tab_compare_models, inputs=img_cmp, outputs=cmp_output)
 
         # ─── TAB 6: EXPORT MEDICAL PDF REPORT ─────────────────────
         with gr.Tab("📄 Xuất Báo Cáo PDF"):
