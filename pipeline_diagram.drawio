@@ -1,356 +1,310 @@
-<mxGraphModel dx="2200" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1100" math="0" shadow="1">
+<mxGraphModel dx="2200" dy="1200" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1150" math="0" shadow="1">
   <root>
     <mxCell id="0" />
     <mxCell id="1" parent="0" />
 
     <!-- ========== TITLE ========== -->
-    <mxCell id="title" value="&lt;font style='font-size:18px;'&gt;🧬 PIPELINE TỔNG QUAN — Huấn luyện &amp; Giải thích Qwen 3.5 cho Phân loại Tế bào Máu&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
-      <mxGeometry x="100" y="15" width="1400" height="40" as="geometry" />
+    <mxCell id="title" value="&lt;font style='font-size:18px;'&gt;🧬 PIPELINE TỔNG QUAN — Thử nghiệm Đa mô hình Qwen 3.5 / Qwen 2.5 &amp; Giải thích XAI (4 CAMs)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+      <mxGeometry x="100" y="15" width="1450" height="40" as="geometry" />
     </mxCell>
-    <mxCell id="subtitle" value="&lt;font color='#555' style='font-size:11px;'&gt;Nhóm: Nguyễn Quốc Vinh · Hồ Nhật Hào · Lê Trần Quốc Huy  |  Platform: Kaggle (GPU T4 x2)  |  Model: Qwen3.5 + EfficientNet-B2  |  XAI: HiresCAM · XGrad-CAM · EigenCAM · Integrated Gradients&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;" vertex="1" parent="1">
-      <mxGeometry x="100" y="50" width="1400" height="25" as="geometry" />
+    <mxCell id="subtitle" value="&lt;font color='#555' style='font-size:11px;'&gt;Mô hình Đại diện: Qwen 3.5 (0.5B / 1.5B)  |  Mô hình Thử nghiệm/So sánh: Qwen 2.5-3B (LoRA) &amp; EfficientNet-B2  |  Dataset-Crop (12 Classes, 45,814 ảnh)&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;" vertex="1" parent="1">
+      <mxGeometry x="100" y="50" width="1450" height="25" as="geometry" />
     </mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 1: DATASET (Left column) ==================== -->
+    <!-- ====== PHASE 1: DATASET (Column 1) ======================= -->
     <!-- ========================================================== -->
-    <mxCell id="phase1_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="30" y="90" width="200" height="400" as="geometry" />
+    <mxCell id="phase1_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="25" y="90" width="195" height="420" as="geometry" />
     </mxCell>
-    <mxCell id="phase1_lbl" value="📂 PHASE 1&#xa;Dữ liệu (Dataset)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#0d47a1;" vertex="1" parent="1">
-      <mxGeometry x="35" y="95" width="190" height="35" as="geometry" />
-    </mxCell>
-
-    <!-- Dataset Cylinder -->
-    <mxCell id="dataset" value="Dataset-Crop&#xa;45,814 ảnh tế bào&#xa;12 loại (BA, BNE, EO,&#xa;ERB, LY, MMY, MO,&#xa;MY, MYO, PLT, PMY, SNE)" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;fontStyle=0;align=center;" vertex="1" parent="1">
-      <mxGeometry x="50" y="140" width="160" height="105" as="geometry" />
+    <mxCell id="phase1_lbl" value="📂 PHASE 1&#xa;Tập dữ liệu (Dataset)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#0d47a1;" vertex="1" parent="1">
+      <mxGeometry x="30" y="95" width="185" height="35" as="geometry" />
     </mxCell>
 
-    <!-- Split -->
+    <mxCell id="dataset" value="Dataset-Crop&#xa;45,814 ảnh tế bào&#xa;12 loại: BA, BNE, EO,&#xa;ERB, LY, MMY, MO,&#xa;MY, MYO, PLT, PMY, SNE" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#bbdefb;strokeColor=#1565c0;fontSize=9;fontStyle=0;align=center;" vertex="1" parent="1">
+      <mxGeometry x="42" y="140" width="160" height="105" as="geometry" />
+    </mxCell>
+
     <mxCell id="split_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#3f51b5;strokeWidth=1;dashed=1;" vertex="1" parent="1">
-      <mxGeometry x="45" y="265" width="170" height="210" as="geometry" />
+      <mxGeometry x="37" y="265" width="170" height="230" as="geometry" />
     </mxCell>
-    <mxCell id="split_title" value="Chia tập dữ liệu&#xa;(train_test_split)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
-      <mxGeometry x="50" y="268" width="160" height="30" as="geometry" />
+    <mxCell id="split_title" value="Phân chia Dữ liệu&#xa;(train_test_split)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
+      <mxGeometry x="42" y="268" width="160" height="30" as="geometry" />
     </mxCell>
-    <mxCell id="trainset" value="🟢 Train Set&#xa;(70%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=10;fontStyle=1;" vertex="1" parent="1">
-      <mxGeometry x="60" y="305" width="140" height="35" as="geometry" />
+    <mxCell id="trainset" value="🟢 Train Set (70%)&#xa;~32,070 ảnh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="52" y="305" width="140" height="38" as="geometry" />
     </mxCell>
-    <mxCell id="valset" value="🟡 Validation Set&#xa;(15%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=10;fontStyle=1;" vertex="1" parent="1">
-      <mxGeometry x="60" y="350" width="140" height="35" as="geometry" />
+    <mxCell id="valset" value="🟡 Validation Set (15%)&#xa;~6,872 ảnh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="52" y="355" width="140" height="38" as="geometry" />
     </mxCell>
-    <mxCell id="testset" value="🔴 Test Set&#xa;(15%)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=10;fontStyle=1;" vertex="1" parent="1">
-      <mxGeometry x="60" y="395" width="140" height="35" as="geometry" />
+    <mxCell id="testset" value="🔴 Test Set (15%)&#xa;~6,872 ảnh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="52" y="405" width="140" height="38" as="geometry" />
     </mxCell>
 
-    <!-- Arrow: Dataset -> Split -->
-    <mxCell id="e_ds_split" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1565c0;strokeWidth=2;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" source="dataset" target="split_box" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_ds_split" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#1565c0;strokeWidth=2;" edge="1" source="dataset" target="split_box" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 2: PREPROCESSING (Middle-left) ============== -->
+    <!-- ====== PHASE 2: PREPROCESSING & FEATURE EXTRACTION ======= -->
     <!-- ========================================================== -->
-    <mxCell id="phase2_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="260" y="90" width="260" height="580" as="geometry" />
+    <mxCell id="phase2_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="245" y="90" width="265" height="580" as="geometry" />
     </mxCell>
     <mxCell id="phase2_lbl" value="⚙️ PHASE 2&#xa;Tiền xử lý &amp; Trích xuất Đặc trưng" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#e65100;" vertex="1" parent="1">
-      <mxGeometry x="265" y="95" width="250" height="35" as="geometry" />
+      <mxGeometry x="250" y="95" width="255" height="35" as="geometry" />
     </mxCell>
 
-    <!-- === Sub-group: Image Processing === -->
-    <mxCell id="img_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#fbc02d;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-      <mxGeometry x="275" y="140" width="230" height="240" as="geometry" />
+    <!-- Sub-group Image -->
+    <mxCell id="img_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#fbc02d;strokeWidth=1.5;" vertex="1" parent="1">
+      <mxGeometry x="260" y="140" width="235" height="235" as="geometry" />
     </mxCell>
-    <mxCell id="img_title" value="🖼️ Xử lý Hình ảnh (Image Pipeline)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#f57f17;" vertex="1" parent="1">
-      <mxGeometry x="280" y="143" width="220" height="22" as="geometry" />
-    </mxCell>
-
-    <mxCell id="img_read" value="1. Đọc ảnh (PIL)&#xa;   Image.open().convert('RGB')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="285" y="170" width="210" height="35" as="geometry" />
-    </mxCell>
-    <mxCell id="img_aug" value="2. Tăng cường dữ liệu (Augmentation)&#xa;   • RandomHorizontalFlip (p=0.5)&#xa;   • RandomVerticalFlip (p=0.5)&#xa;   • RandomRotation (45°)&#xa;   • ColorJitter (brightness, contrast)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=9;align=left;spacingLeft=8;fontStyle=0;" vertex="1" parent="1">
-      <mxGeometry x="285" y="213" width="210" height="78" as="geometry" />
-    </mxCell>
-    <mxCell id="img_resize" value="3. Resize ảnh&#xa;   224×224 (LANCZOS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="285" y="299" width="210" height="32" as="geometry" />
-    </mxCell>
-    <mxCell id="img_norm" value="4. Normalize&#xa;   mean=[0.485,0.456,0.406]&#xa;   std=[0.229,0.224,0.225]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="285" y="339" width="210" height="35" as="geometry" />
+    <mxCell id="img_title" value="🖼️ 1. Tiền xử lý Hình ảnh" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#f57f17;" vertex="1" parent="1">
+      <mxGeometry x="265" y="143" width="225" height="22" as="geometry" />
     </mxCell>
 
-    <!-- Arrows inside image pipeline -->
+    <mxCell id="img_read" value="Đọc ảnh tế bào (RGB)&#xa;Image.open().convert('RGB')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="168" width="215" height="32" as="geometry" />
+    </mxCell>
+    <mxCell id="img_aug" value="Tăng cường dữ liệu (Augmentation)&#xa;• Flip ngẫu nhiên (H/V, p=0.5)&#xa;• RandomRotation (45°)&#xa;• ColorJitter (Brightness, Contrast)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="208" width="215" height="72" as="geometry" />
+    </mxCell>
+    <mxCell id="img_resize" value="Resize 224×224 (LANCZOS)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="288" width="215" height="30" as="geometry" />
+    </mxCell>
+    <mxCell id="img_norm" value="Chuẩn hóa (Normalization)&#xa;mean=[0.485,0.456,0.406], std=[0.229,0.224,0.225]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="326" width="215" height="40" as="geometry" />
+    </mxCell>
+
     <mxCell id="eimg1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="img_read" target="img_aug" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
     <mxCell id="eimg2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="img_aug" target="img_resize" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
     <mxCell id="eimg3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="img_resize" target="img_norm" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-    <!-- === Sub-group: Text/Prompt Processing === -->
-    <mxCell id="txt_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#e91e63;strokeWidth=1.5;dashed=0;" vertex="1" parent="1">
-      <mxGeometry x="275" y="395" width="230" height="145" as="geometry" />
+    <!-- Sub-group Prompt -->
+    <mxCell id="txt_group" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#e91e63;strokeWidth=1.5;" vertex="1" parent="1">
+      <mxGeometry x="260" y="390" width="235" height="135" as="geometry" />
     </mxCell>
-    <mxCell id="txt_title" value="💬 Xử lý Văn bản (Prompt Pipeline)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#c2185b;" vertex="1" parent="1">
-      <mxGeometry x="280" y="398" width="220" height="22" as="geometry" />
+    <mxCell id="txt_title" value="💬 2. Xử lý Văn bản &amp; Prompt" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#c2185b;" vertex="1" parent="1">
+      <mxGeometry x="265" y="393" width="225" height="22" as="geometry" />
     </mxCell>
-
-    <mxCell id="prompt_build" value="1. build_prompt()&#xa;   'This is a microscopic image of&#xa;    a blood cell. Classify into:&#xa;    BA, BNE, EO, ERB, LY, MMY...'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="285" y="425" width="210" height="55" as="geometry" />
+    <mxCell id="prompt_build" value="build_prompt()&#xa;'Classify cell into 12 categories: BA, BNE, EO...'" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="418" width="215" height="42" as="geometry" />
     </mxCell>
-    <mxCell id="chat_template" value="2. apply_chat_template()&#xa;   role: user → image + text&#xa;   role: assistant → label" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="285" y="488" width="210" height="42" as="geometry" />
-    </mxCell>
-
-    <mxCell id="etxt1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="prompt_build" target="chat_template" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-
-    <!-- === Processor (Merge) === -->
-    <mxCell id="processor" value="🔀 Qwen AutoProcessor&#xa;Tokenization → Tensors:&#xa;• input_ids    • pixel_values&#xa;• attention_mask  • image_grid_thw&#xa;• labels (masked prompt = -100)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=9;fontStyle=1;align=left;spacingLeft=10;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="275" y="555" width="230" height="82" as="geometry" />
+    <mxCell id="chat_template" value="apply_chat_template()&#xa;Định dạng hội thoại user/assistant" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="270" y="468" width="215" height="42" as="geometry" />
     </mxCell>
 
-    <!-- Arrows: Image & Text → Processor -->
-    <mxCell id="eimgp" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="img_norm" target="processor" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="etxtp" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="chat_template" target="processor" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <!-- Feature Extractor Node -->
+    <mxCell id="feat_extractor" value="🔍 3. Rút trích Đặc trưng (Feature Extraction)&#xa;• Image Features (Vision Encoder / Backbone)&#xa;• Text Tokens (AutoProcessor Tokenizer)&#xa;→ Xuất Tensors: input_ids, pixel_values" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#e65100;fontSize=9;fontStyle=1;align=left;spacingLeft=10;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="260" y="545" width="235" height="90" as="geometry" />
+    </mxCell>
 
-    <!-- Arrows: Dataset splits → Phase 2 -->
+    <!-- Connections Phase 2 -->
     <mxCell id="e_train_p2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#2e7d32;strokeWidth=1.5;" edge="1" source="trainset" target="img_read" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
     <mxCell id="e_val_p2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#f9a825;strokeWidth=1.5;dashed=1;" edge="1" source="valset" target="img_read" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_norm_feat" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="img_norm" target="feat_extractor" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_txt_feat" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="chat_template" target="feat_extractor" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 3: MODEL & TRAINING (Middle-right) ========== -->
+    <!-- ====== PHASE 3: MULTI-MODEL TRAINING (Middle-right) ====== -->
     <!-- ========================================================== -->
-    <mxCell id="phase3_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#4527a0;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="550" y="90" width="300" height="580" as="geometry" />
+    <mxCell id="phase3_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#4527a0;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="535" y="90" width="345" height="580" as="geometry" />
     </mxCell>
-    <mxCell id="phase3_lbl" value="🧠 PHASE 3&#xa;Kiến trúc Mô hình &amp; Huấn luyện" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#311b92;" vertex="1" parent="1">
-      <mxGeometry x="555" y="95" width="290" height="35" as="geometry" />
-    </mxCell>
-
-    <!-- === Model Architecture === -->
-    <mxCell id="model_arch_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1c4e9;strokeColor=#7e57c2;strokeWidth=1.5;" vertex="1" parent="1">
-      <mxGeometry x="565" y="140" width="270" height="240" as="geometry" />
-    </mxCell>
-    <mxCell id="model_arch_title" value="Kiến trúc QwenCellClassifier" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#4527a0;" vertex="1" parent="1">
-      <mxGeometry x="570" y="143" width="260" height="22" as="geometry" />
+    <mxCell id="phase3_lbl" value="🧠 PHASE 3&#xa;Thử nghiệm &amp; Huấn luyện Đa mô hình" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#311b92;" vertex="1" parent="1">
+      <mxGeometry x="540" y="95" width="335" height="35" as="geometry" />
     </mxCell>
 
-    <mxCell id="backbone" value="🦴 Backbone: EfficientNet-B2&#xa;   (pretrained, ImageNet)&#xa;   Trích xuất feature map" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9575cd;fontSize=9;align=left;spacingLeft=8;fontStyle=0;" vertex="1" parent="1">
-      <mxGeometry x="580" y="170" width="240" height="45" as="geometry" />
+    <!-- Model 1: Qwen 3.5 (Main Representative) -->
+    <mxCell id="m_qwen35_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1c4e9;strokeColor=#673ab7;strokeWidth=2;" vertex="1" parent="1">
+      <mxGeometry x="550" y="140" width="315" height="210" as="geometry" />
     </mxCell>
-    <mxCell id="pooling" value="🔲 AdaptiveAvgPool2d(1)&#xa;   → Flatten vector" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9575cd;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="580" y="223" width="240" height="32" as="geometry" />
+    <mxCell id="m_qwen35_title" value="🌟 MÔ HÌNH ĐẠI DIỆN CHÍNH: Qwen 3.5 (0.5B / 1.5B)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#311b92;" vertex="1" parent="1">
+      <mxGeometry x="555" y="143" width="305" height="22" as="geometry" />
     </mxCell>
-    <mxCell id="classifier_head" value="🧮 Classifier Head:&#xa;   Linear(1408→512) → ReLU → Dropout(0.3)&#xa;   → Linear(512→256) → ReLU → Dropout(0.2)&#xa;   → Linear(256→12)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9575cd;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="580" y="263" width="240" height="60" as="geometry" />
+    <mxCell id="qwen35_desc" value="• Architecture: Qwen3.5-1.5B-Instruct / QwenCellClassifier&#xa;• Backbone: EfficientNet-B2 + Multimodal Head&#xa;• Training: 30 Epochs, AdamW (lr=3e-4), CosineLR&#xa;• Loss: CrossEntropyLoss (label_smoothing=0.1)&#xa;• Tối ưu cho cả Phân loại &amp; Trích xuất Heatmap XAI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9575cd;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="560" y="170" width="295" height="80" as="geometry" />
     </mxCell>
-    <mxCell id="output_logits" value="📤 Output: logits (12 classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b39ddb;strokeColor=#4527a0;fontSize=10;fontStyle=1;fontColor=#fff;" vertex="1" parent="1">
-      <mxGeometry x="580" y="331" width="240" height="28" as="geometry" />
-    </mxCell>
-
-    <!-- Arrows inside model -->
-    <mxCell id="em1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#9575cd;strokeWidth=1;" edge="1" source="backbone" target="pooling" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="em2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#9575cd;strokeWidth=1;" edge="1" source="pooling" target="classifier_head" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="em3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#9575cd;strokeWidth=1;" edge="1" source="classifier_head" target="output_logits" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-
-    <!-- === Training Config === -->
-    <mxCell id="train_cfg_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#5c6bc0;strokeWidth=1.5;" vertex="1" parent="1">
-      <mxGeometry x="565" y="395" width="270" height="155" as="geometry" />
-    </mxCell>
-    <mxCell id="train_cfg_title" value="⚡ Cấu hình Huấn luyện" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
-      <mxGeometry x="570" y="398" width="260" height="22" as="geometry" />
+    <mxCell id="qwen35_out" value="💾 Checkpoint mô hình Qwen 3.5&#xa;qwen_cell_classifier_best.pth" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#5e35b1;fontColor=#fff;strokeColor=#311b92;fontSize=10;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="590" y="260" width="235" height="75" as="geometry" />
     </mxCell>
 
-    <mxCell id="train_detail" value="• Epochs: 30&#xa;• Optimizer: AdamW (lr=3e-4, wd=1e-4)&#xa;• Scheduler: CosineAnnealingLR&#xa;• Loss: CrossEntropyLoss (label_smooth=0.1)&#xa;• Batch Size: 32  |  Seed: 42&#xa;• Early Stopping&#xa;• Save best model (val_acc)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=10;" vertex="1" parent="1">
-      <mxGeometry x="575" y="425" width="250" height="110" as="geometry" />
+    <!-- Model 2: Qwen 2.5-3B LoRA (Teammate's model / Comparison) -->
+    <mxCell id="m_qwen25_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#3f51b5;strokeWidth=1.5;" vertex="1" parent="1">
+      <mxGeometry x="550" y="365" width="315" height="155" as="geometry" />
+    </mxCell>
+    <mxCell id="m_qwen25_title" value="🤝 MÔ HÌNH THỬ NGHIỆM PHỤ: Qwen 2.5-3B (LoRA 4-bit)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+      <mxGeometry x="555" y="368" width="305" height="22" as="geometry" />
+    </mxCell>
+    <mxCell id="qwen25_desc" value="• Base Model: Qwen2.5-VL-3B-Instruct (4-bit NF4)&#xa;• PEFT/LoRA: r=16, alpha=32, dropout=0.2&#xa;• Target Modules: q_proj, v_proj, k_proj, o_proj...&#xa;• Checkpoint: checkpoint-1500 / final adapter" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#7986cb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="560" y="395" width="295" height="70" as="geometry" />
+    </mxCell>
+    <mxCell id="qwen25_out" value="💾 Checkpoint Qwen2.5-VL LoRA Adapter" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=6;fillColor=#3f51b5;fontColor=#fff;strokeColor=#1a237e;fontSize=9;fontStyle=1;align=center;" vertex="1" parent="1">
+      <mxGeometry x="590" y="472" width="235" height="42" as="geometry" />
     </mxCell>
 
-    <!-- === Trained Model Output === -->
-    <mxCell id="trained_model" value="💾 Mô hình đã huấn luyện&#xa;qwen_cell_classifier_best.pth" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#5e35b1;fontColor=#ffffff;strokeColor=#311b92;fontSize=10;fontStyle=1;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="610" y="570" width="200" height="75" as="geometry" />
+    <!-- Model Comparison Box -->
+    <mxCell id="model_comp" value="⚖️ So sánh Đa mô hình (Model Comparison &amp; Selection)&#xa;Đánh giá Accuracy, F1-score &amp; Khả năng giải thích XAI → Chọn Qwen 3.5" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#b39ddb;strokeColor=#512da8;fontSize=9;fontStyle=1;fontColor=#fff;" vertex="1" parent="1">
+      <mxGeometry x="550" y="540" width="315" height="45" as="geometry" />
     </mxCell>
 
-    <!-- Arrows: Processor → Model, Model → Trained -->
-    <mxCell id="e_proc_model" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4527a0;strokeWidth=2;" edge="1" source="processor" target="backbone" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="e_model_trained" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4527a0;strokeWidth=2;" edge="1" source="train_detail" target="trained_model" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <!-- Arrow Phase 2 -> Phase 3 -->
+    <mxCell id="e_p2_p3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#4527a0;strokeWidth=2;" edge="1" source="feat_extractor" target="m_qwen35_bg" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_p2_p3_sub" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3f51b5;strokeWidth=1.5;dashed=1;" edge="1" source="feat_extractor" target="m_qwen25_bg" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 4: EVALUATION (Top-right) =================== -->
+    <!-- ====== PHASE 4: EVALUATION & RESULTS (Top right) ========= -->
     <!-- ========================================================== -->
-    <mxCell id="phase4_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="880" y="90" width="270" height="280" as="geometry" />
+    <mxCell id="phase4_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="905" y="90" width="345" height="235" as="geometry" />
     </mxCell>
-    <mxCell id="phase4_lbl" value="📊 PHASE 4&#xa;Đánh giá Mô hình (Evaluation)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#004d40;" vertex="1" parent="1">
-      <mxGeometry x="885" y="95" width="260" height="35" as="geometry" />
-    </mxCell>
-
-    <mxCell id="eval_input" value="🔴 Test Set → Inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=10;fontStyle=1;" vertex="1" parent="1">
-      <mxGeometry x="905" y="140" width="220" height="30" as="geometry" />
+    <mxCell id="phase4_lbl" value="📊 PHASE 4&#xa;Đánh giá Đa mô hình (Evaluation)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#004d40;" vertex="1" parent="1">
+      <mxGeometry x="910" y="95" width="335" height="35" as="geometry" />
     </mxCell>
 
-    <mxCell id="eval_metrics" value="📈 Metrics:&#xa;   • Accuracy&#xa;   • F1-Score (Weighted)&#xa;   • Classification Report&#xa;   • Confusion Matrix" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aaa;fontSize=9;align=left;spacingLeft=10;" vertex="1" parent="1">
-      <mxGeometry x="905" y="180" width="220" height="80" as="geometry" />
+    <mxCell id="eval_input" value="🔴 Test Set (6,872 ảnh) → Inference" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="920" y="138" width="315" height="28" as="geometry" />
     </mxCell>
 
-    <mxCell id="eval_result" value="✅ Kết quả:&#xa;   Accuracy ≈ 97.3%&#xa;   F1 Weighted ≈ 0.973" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=10;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
-      <mxGeometry x="905" y="270" width="220" height="55" as="geometry" />
+    <mxCell id="eval_metrics" value="📈 Các Chỉ số Đánh giá:&#xa;• Accuracy (Độ chính xác toàn cục)&#xa;• F1-Score Weighted (Cân bằng 12 lớp)&#xa;• Classification Report &amp; Confusion Matrix" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aaa;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="920" y="174" width="315" height="60" as="geometry" />
     </mxCell>
 
-    <!-- Arrows Eval -->
+    <mxCell id="eval_result" value="🏆 Kết quả Thử nghiệm:&#xa;• Qwen 3.5 (Main Classifier): Accuracy ≈ 97.3% | F1 ≈ 0.973&#xa;• Qwen 2.5-3B (LoRA VLM): Accuracy ≈ 96.8% | VLM NL Output" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=9;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="920" y="242" width="315" height="60" as="geometry" />
+    </mxCell>
+
     <mxCell id="eeval1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="eval_input" target="eval_metrics" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
     <mxCell id="eeval2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#aaa;strokeWidth=1;" edge="1" source="eval_metrics" target="eval_result" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-    <!-- Arrow: Test Set → Eval -->
-    <mxCell id="e_test_eval" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;dashed=1;" edge="1" source="testset" target="eval_input" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <!-- Arrow: Trained Model → Eval -->
-    <mxCell id="e_trained_eval" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#5e35b1;strokeWidth=1.5;dashed=1;" edge="1" source="trained_model" target="eval_metrics" parent="1">
-      <mxGeometry relative="1" as="geometry">
-        <Array as="points">
-          <mxPoint x="860" y="608" />
-          <mxPoint x="860" y="220" />
-        </Array>
-      </mxGeometry>
-    </mxCell>
+    <!-- Connection Model -> Eval -->
+    <mxCell id="e_mout_eval" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#5e35b1;strokeWidth=1.5;dashed=1;" edge="1" source="qwen35_out" target="eval_metrics" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 5: XAI (Bottom-right) ======================= -->
+    <!-- ====== PHASE 5: XAI MODULE (Bottom right) ================ -->
     <!-- ========================================================== -->
-    <mxCell id="phase5_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c62828;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="880" y="390" width="680" height="280" as="geometry" />
+    <mxCell id="phase5_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdedec;strokeColor=#c62828;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="905" y="340" width="715" height="330" as="geometry" />
     </mxCell>
-    <mxCell id="phase5_lbl" value="🔍 PHASE 5 — Giải thích Mô hình (Explainable AI — XAI)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#b71c1c;" vertex="1" parent="1">
-      <mxGeometry x="885" y="395" width="670" height="30" as="geometry" />
+    <mxCell id="phase5_lbl" value="🔍 PHASE 5 — Khối Giải thích XAI (4 CAMs → 4 Kết quả Heatmap tương ứng)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#b71c1c;" vertex="1" parent="1">
+      <mxGeometry x="910" y="345" width="705" height="30" as="geometry" />
     </mxCell>
 
     <!-- XAI Input -->
-    <mxCell id="xai_input" value="Ảnh tế bào&#xa;+ Mô hình&#xa;đã huấn luyện" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontSize=9;fontStyle=1;" vertex="1" parent="1">
-      <mxGeometry x="900" y="440" width="100" height="55" as="geometry" />
+    <mxCell id="xai_input" value="Mô hình Qwen 3.5&#xa;+ Ảnh tế bào đầu vào" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#e53935;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="920" y="450" width="120" height="50" as="geometry" />
     </mxCell>
 
-    <!-- 4 XAI Methods -->
-    <mxCell id="xai_methods_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;strokeWidth=1.5;" vertex="1" parent="1">
-      <mxGeometry x="1030" y="430" width="290" height="195" as="geometry" />
+    <!-- 4 CAM Blocks (1-to-1 Mapping) -->
+    <mxCell id="cam1" value="1. HiResCAM&#xa;(Grad × Activation)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="1070" y="390" width="130" height="45" as="geometry" />
     </mxCell>
-    <mxCell id="xai_methods_title" value="4 Phương pháp XAI" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#e65100;" vertex="1" parent="1">
-      <mxGeometry x="1035" y="433" width="280" height="22" as="geometry" />
+    <mxCell id="cam2" value="2. XGrad-CAM&#xa;(Axiomatic Weighted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="1070" y="455" width="130" height="45" as="geometry" />
     </mxCell>
-
-    <mxCell id="hirescam" value="1. HiResCAM&#xa;   Gradient × Activation (high-res)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff9800;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1045" y="460" width="260" height="32" as="geometry" />
+    <mxCell id="cam3" value="3. EigenCAM&#xa;(PCA Activations)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="1070" y="520" width="130" height="45" as="geometry" />
     </mxCell>
-    <mxCell id="xgradcam" value="2. XGrad-CAM&#xa;   Element-wise weighted gradient" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff9800;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1045" y="498" width="260" height="32" as="geometry" />
-    </mxCell>
-    <mxCell id="eigencam" value="3. EigenCAM&#xa;   PCA trên activation maps (ít nhiễu)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff9800;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1045" y="536" width="260" height="32" as="geometry" />
-    </mxCell>
-    <mxCell id="intgrad" value="4. Integrated Gradients&#xa;   Tích phân gradient từ baseline → ảnh gốc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#ff9800;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1045" y="574" width="260" height="38" as="geometry" />
+    <mxCell id="cam4" value="4. Integrated Gradients&#xa;(Path-integral Attribution)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#ef6c00;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+      <mxGeometry x="1070" y="585" width="130" height="45" as="geometry" />
     </mxCell>
 
-    <!-- XAI Faithfulness Test -->
-    <mxCell id="faith_test" value="🧪 Faithfulness Test&#xa;   Deletion / Insertion&#xa;   (Kiểm tra độ tin cậy Heatmap)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fbe9e7;strokeColor=#d84315;fontSize=9;fontStyle=0;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1350" y="440" width="195" height="55" as="geometry" />
+    <!-- 4 Corresponding Heatmap Results -->
+    <mxCell id="hm1" value="🖼️ Kết quả 1: Heatmap HiResCAM&#xa;(Hiển thị vùng nhân tế bào sắc nét)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ffa000;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+      <mxGeometry x="1240" y="390" width="185" height="45" as="geometry" />
+    </mxCell>
+    <mxCell id="hm2" value="🖼️ Kết quả 2: Heatmap XGrad-CAM&#xa;(Tập trung độ tương phản tế bào chất)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ffa000;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+      <mxGeometry x="1240" y="455" width="185" height="45" as="geometry" />
+    </mxCell>
+    <mxCell id="hm3" value="🖼️ Kết quả 3: Heatmap EigenCAM&#xa;(Lọc nhiễu nền, làm rõ hình thể)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ffa000;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+      <mxGeometry x="1240" y="520" width="185" height="45" as="geometry" />
+    </mxCell>
+    <mxCell id="hm4" value="🖼️ Kết quả 4: Attribution IntGrad&#xa;(Đo lường mức độ đóng góp từng pixel)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ffa000;fontSize=9;align=left;spacingLeft=6;" vertex="1" parent="1">
+      <mxGeometry x="1240" y="585" width="185" height="45" as="geometry" />
     </mxCell>
 
-    <!-- XAI Output -->
-    <mxCell id="xai_output" value="📊 Kết quả XAI&#xa;• 2×2 Heatmap Grid&#xa;  (mỗi phương pháp)&#xa;• Overlay trên ảnh gốc&#xa;• Vùng chú ý (nhân,&#xa;  tế bào chất, v.v.)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=9;fontStyle=1;fontColor=#fff;align=left;spacingLeft=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="1350" y="520" width="195" height="95" as="geometry" />
+    <!-- Arrows 1-to-1 Mapping CAM -> Result -->
+    <mxCell id="ecam1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="cam1" target="hm1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ecam2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="cam2" target="hm2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ecam3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="cam3" target="hm3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="ecam4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e65100;strokeWidth=1.5;" edge="1" source="cam4" target="hm4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- Arrow Input -> 4 CAMs -->
+    <mxCell id="e_in_cam1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;" edge="1" source="xai_input" target="cam1" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_in_cam2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;" edge="1" source="xai_input" target="cam2" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_in_cam3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;" edge="1" source="xai_input" target="cam3" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_in_cam4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1.5;" edge="1" source="xai_input" target="cam4" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+
+    <!-- XAI Grid Output Final Block -->
+    <mxCell id="xai_grid_out" value="🔲 Lưới 2×2 Heatmap Grid&#xa;Hiển thị trực quan 4 kết quả&#xa;trên giao diện bác sĩ&#xa;+ Faithfulness Test&#xa;  (Deletion/Insertion)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ef9a9a;strokeColor=#c62828;fontSize=9;fontStyle=1;fontColor=#fff;align=left;spacingLeft=8;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1455" y="450" width="150" height="120" as="geometry" />
     </mxCell>
 
-    <!-- Arrows XAI -->
-    <mxCell id="exai1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#e53935;strokeWidth=1.5;" edge="1" source="xai_input" target="xai_methods_bg" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="exai2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#ef6c00;strokeWidth=1.5;" edge="1" source="xai_methods_bg" target="faith_test" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="exai3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#ef6c00;strokeWidth=1.5;" edge="1" source="xai_methods_bg" target="xai_output" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_hm_grid1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1;" edge="1" source="hm1" target="xai_grid_out" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_hm_grid2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1;" edge="1" source="hm2" target="xai_grid_out" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_hm_grid3" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1;" edge="1" source="hm3" target="xai_grid_out" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
+    <mxCell id="e_hm_grid4" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#c62828;strokeWidth=1;" edge="1" source="hm4" target="xai_grid_out" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
-    <!-- Arrow: Trained Model → XAI -->
-    <mxCell id="e_trained_xai" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#5e35b1;strokeWidth=2;dashed=1;" edge="1" source="trained_model" target="xai_input" parent="1">
+    <!-- Connection Qwen 3.5 -> XAI Input -->
+    <mxCell id="e_qwen35_xai" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#5e35b1;strokeWidth=2;dashed=1;" edge="1" source="qwen35_out" target="xai_input" parent="1">
       <mxGeometry relative="1" as="geometry">
         <Array as="points">
-          <mxPoint x="860" y="608" />
-          <mxPoint x="860" y="468" />
+          <mxPoint x="880" y="298" />
+          <mxPoint x="880" y="475" />
         </Array>
       </mxGeometry>
     </mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== PHASE 6: VLM AGENT (Far right) ==================== -->
+    <!-- ====== PHASE 6: VLM DECISION AGENT (Top right far) ======= -->
     <!-- ========================================================== -->
-    <mxCell id="phase6_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;strokeWidth=2;arcSize=8;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="1180" y="90" width="370" height="280" as="geometry" />
+    <mxCell id="phase6_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;strokeWidth=2;arcSize=6;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1275" y="90" width="345" height="235" as="geometry" />
     </mxCell>
-    <mxCell id="phase6_lbl" value="🤖 PHASE 6&#xa;Qwen VLM Agent (Giải thích Y khoa)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
-      <mxGeometry x="1185" y="95" width="360" height="35" as="geometry" />
-    </mxCell>
-
-    <mxCell id="vlm_qwen" value="Qwen2.5-VL-3B-Instruct&#xa;+ LoRA (checkpoint-1500)&#xa;Fine-tuned trên Dataset-Crop" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c5cae9;strokeColor=#3f51b5;fontSize=10;fontStyle=1;shadow=1;" vertex="1" parent="1">
-      <mxGeometry x="1200" y="145" width="220" height="55" as="geometry" />
+    <mxCell id="phase6_lbl" value="🤖 PHASE 6&#xa;Decision Agent &amp; VLM NL Output" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=12;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+      <mxGeometry x="1280" y="95" width="335" height="35" as="geometry" />
     </mxCell>
 
-    <mxCell id="vlm_input" value="Input:&#xa;  Ảnh tế bào + Prompt phân loại" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#bbb;fontSize=9;align=left;spacingLeft=8;" vertex="1" parent="1">
-      <mxGeometry x="1200" y="210" width="220" height="32" as="geometry" />
+    <mxCell id="vlm_agent" value="🤖 Decision Agent (Multi-Model Integration)&#xa;Qwen 3.5 (0.5B/1.5B) + Qwen 2.5-3B (LoRA)&#xa;Tổng hợp phân loại &amp; Giải thích ngôn ngữ tự nhiên" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c5cae9;strokeColor=#3f51b5;fontSize=9;fontStyle=1;align=left;spacingLeft=8;shadow=1;" vertex="1" parent="1">
+      <mxGeometry x="1290" y="138" width="315" height="52" as="geometry" />
     </mxCell>
 
-    <mxCell id="vlm_output_box" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#5c6bc0;strokeWidth=1;dashed=1;" vertex="1" parent="1">
-      <mxGeometry x="1195" y="252" width="340" height="100" as="geometry" />
-    </mxCell>
-    <mxCell id="vlm_out_title" value="Output:" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;fontStyle=1;fontColor=#283593;" vertex="1" parent="1">
-      <mxGeometry x="1200" y="255" width="80" height="18" as="geometry" />
-    </mxCell>
-    <mxCell id="vlm_out1" value="• Nhãn phân loại (e.g., 'LY')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9fa8da;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
-      <mxGeometry x="1205" y="278" width="160" height="25" as="geometry" />
-    </mxCell>
-    <mxCell id="vlm_out2" value="• Giải thích y khoa bằng NL" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9fa8da;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
-      <mxGeometry x="1205" y="308" width="160" height="25" as="geometry" />
-    </mxCell>
-    <mxCell id="vlm_fallback" value="Decision Agent&#xa;(Fallback)&#xa;EfficientNet-B2&#xa;Top-5 + Qwen LLM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ffa000;fontSize=9;fontStyle=1;align=center;" vertex="1" parent="1">
-      <mxGeometry x="1385" y="268" width="140" height="68" as="geometry" />
+    <mxCell id="vlm_out_final" value="📋 Kết quả Cuối cùng xuất ra Giao diện:&#xa;1. Nhãn tế bào phân loại (Top-1 &amp; Top-5 Probabilities)&#xa;2. Lưới 2×2 XAI Heatmap (HiResCAM, XGrad, Eigen, IntGrad)&#xa;3. Chẩn đoán y khoa tự nhiên (VLM Natural Language Report)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#3f51b5;fontSize=9;fontStyle=1;align=left;spacingLeft=8;" vertex="1" parent="1">
+      <mxGeometry x="1290" y="202" width="315" height="100" as="geometry" />
     </mxCell>
 
-    <!-- Arrows VLM -->
-    <mxCell id="evlm1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3f51b5;strokeWidth=1;" edge="1" source="vlm_qwen" target="vlm_input" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-    <mxCell id="evlm2" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3f51b5;strokeWidth=1;" edge="1" source="vlm_input" target="vlm_output_box" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
-
-    <!-- Arrow: Trained Model → VLM (shows flow) -->
-    <mxCell id="e_trained_vlm" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#283593;strokeWidth=1.5;dashed=1;" edge="1" source="eval_result" target="vlm_qwen" parent="1">
-      <mxGeometry relative="1" as="geometry">
-        <Array as="points">
-          <mxPoint x="1170" y="298" />
-          <mxPoint x="1170" y="173" />
-        </Array>
-      </mxGeometry>
-    </mxCell>
+    <mxCell id="evlm_out" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeColor=#3f51b5;strokeWidth=1.5;" edge="1" source="vlm_agent" target="vlm_out_final" parent="1"><mxGeometry relative="1" as="geometry" /></mxCell>
 
     <!-- ========================================================== -->
-    <!-- ====== LEGEND ============================================ -->
+    <!-- ====== LEGEND (Bottom left) ============================== -->
     <!-- ========================================================== -->
     <mxCell id="legend_bg" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#ccc;strokeWidth=1;" vertex="1" parent="1">
-      <mxGeometry x="30" y="520" width="200" height="150" as="geometry" />
+      <mxGeometry x="25" y="530" width="195" height="140" as="geometry" />
     </mxCell>
     <mxCell id="legend_title" value="📌 Chú thích" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=11;fontStyle=1;fontColor=#333;" vertex="1" parent="1">
-      <mxGeometry x="35" y="523" width="190" height="20" as="geometry" />
+      <mxGeometry x="30" y="533" width="185" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg1" value="Dữ liệu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="45" y="548" width="75" height="18" as="geometry" />
+    <mxCell id="leg1" value="Dữ liệu" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1565c0;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="35" y="555" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg2" value="Tiền xử lý" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="130" y="548" width="75" height="18" as="geometry" />
+    <mxCell id="leg2" value="Tiền xử lý" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#f57f17;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="115" y="555" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg3" value="Mô hình" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#4527a0;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="45" y="572" width="75" height="18" as="geometry" />
+    <mxCell id="leg3" value="Đa mô hình" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ede7f6;strokeColor=#4527a0;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="35" y="578" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg4" value="Đánh giá" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="130" y="572" width="75" height="18" as="geometry" />
+    <mxCell id="leg4" value="Đánh giá" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#00695c;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="115" y="578" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg5" value="XAI" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c62828;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="45" y="596" width="75" height="18" as="geometry" />
+    <mxCell id="leg5" value="XAI 4 CAMs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fdedec;strokeColor=#c62828;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="35" y="601" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg6" value="VLM Agent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="130" y="596" width="75" height="18" as="geometry" />
+    <mxCell id="leg6" value="Agent VLM" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8eaf6;strokeColor=#283593;fontSize=8;" vertex="1" parent="1">
+      <mxGeometry x="115" y="601" width="70" height="18" as="geometry" />
     </mxCell>
-    <mxCell id="leg7" value="─── Luồng chính" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#333;" vertex="1" parent="1">
-      <mxGeometry x="45" y="620" width="90" height="16" as="geometry" />
+    <mxCell id="leg7" value="── Mô hình chính (Qwen 3.5)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=8;fontColor=#333;" vertex="1" parent="1">
+      <mxGeometry x="35" y="622" width="150" height="15" as="geometry" />
     </mxCell>
-    <mxCell id="leg8" value="- - - Luồng phụ" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=9;fontColor=#333;" vertex="1" parent="1">
-      <mxGeometry x="130" y="620" width="90" height="16" as="geometry" />
-    </mxCell>
-    <mxCell id="leg9" value="Dữ liệu kiểm tra (Test)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=9;" vertex="1" parent="1">
-      <mxGeometry x="45" y="642" width="160" height="18" as="geometry" />
+    <mxCell id="leg8" value="- - - Mô hình phụ (LoRA 2.5)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=8;fontColor=#333;" vertex="1" parent="1">
+      <mxGeometry x="35" y="640" width="150" height="15" as="geometry" />
     </mxCell>
 
   </root>
