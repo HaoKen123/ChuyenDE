@@ -1453,7 +1453,7 @@ with gr.Blocks(theme=THEME, css=custom_css, title="Blood Cell AI — YOLO26 + Qw
 
         # ─── TAB SO SÁNH MÔ HÌNH NHÓM ──────────────────────────────
         with gr.Tab("🏆 So Sánh Mô Hình Nhóm"):
-            gr.HTML("<p style='font-family:Inter,sans-serif;font-size:0.88rem;color:#64748b;margin:0 0 16px;'>So sánh kết quả dự đoán trực tiếp giữa mô hình <strong style="color:#a78bfa;">Lê Trần Quốc Huy (Qwen 3.5 .pth)</strong>, <strong style="color:#38bdf8;">Hồ Nhật Hào</strong> và <strong style="color:#6ee7b7;">Nguyễn Quốc Vinh (Qwen 2.5-VL LoRA)</strong> trên cùng 1 ảnh đầu vào.</p>")
+            gr.HTML("""<p style='font-family:Inter,sans-serif;font-size:0.88rem;color:#64748b;margin:0 0 16px;'>So sánh kết quả dự đoán trực tiếp giữa mô hình <strong style='color:#a78bfa;'>Lê Trần Quốc Huy (Qwen 3.5 .pth)</strong>, <strong style='color:#38bdf8;'>Hồ Nhật Hào</strong> và <strong style='color:#6ee7b7;'>Nguyễn Quốc Vinh (Qwen 2.5-VL LoRA)</strong> trên cùng 1 ảnh đầu vào.</p>""")
             with gr.Row(equal_height=False):
                 with gr.Column(scale=1, min_width=300):
                     img_cmp = gr.Image(label="📷 Ảnh tế bào đầu vào", type="numpy", sources=["upload", "clipboard"], height=290)
