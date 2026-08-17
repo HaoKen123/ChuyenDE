@@ -1,0 +1,96 @@
+================================================================
+  BÁO CÁO TỔNG HỢP — QWEN2.5-VL DoRA FINE-TUNING
+  MODEL B — 23004023 | Phân Loại Tế Bào Máu
+================================================================
+
+  Base model     : Qwen/Qwen2.5-VL-3B-Instruct
+  Method         : DoRA (Weight-Decomposed Low-Rank Adaptation)
+  So sánh        : Model A dùng LoRA r=16, alpha=32, batch=8, dropout=0.2
+  Target modules : q_proj, v_proj, k_proj, o_proj, gate_proj, up_proj, down_proj
+  Rank / Alpha   : r=8, alpha=16, dropout=0.1
+  Quantization   : 4-bit NF4 (bitsandbytes)
+  Epochs         : 10  (early stopping patience=3)
+  Eff. batch     : 2 × accum 2 = 4  (Model A=8)
+  Learning rate  : 0.0002  (cosine schedule, warmup 5%)
+  Image size     : 224 × 224
+  Data/class     : 100 ảnh max (stratified subsample)
+  Augmentation   : H/V flip, rotation ±45°, color jitter  ← Model A không có
+
+----------------------------------------------------------------
+  MODEL PARAMETERS
+----------------------------------------------------------------
+  Total params         :   3,774,491,392
+  Trainable (DoRA)  :      19,868,416
+  % Trainable          :         0.5264%
+
+----------------------------------------------------------------
+  ĐIỂM KHÁC BIỆT DoRA vs LoRA
+----------------------------------------------------------------
+  DoRA phân tách weight W = m × (V / ||V||)
+    m = magnitude (scalar, trainable)
+    V = direction (updated via low-rank: V₀ + BA)
+  → Giữ magnitude gốc ổn định, chỉ update direction
+  → Ở cùng rank (r=8), DoRA cho kết quả tốt hơn LoRA
+  → Model A: LoRA r=16 | Model B: DoRA r=8 (ít param hơn, chất lượng tương đương)
+
+----------------------------------------------------------------
+  EVALUATION RESULTS  (Validation Set)
+----------------------------------------------------------------
+  Overall Accuracy  : 0.8278  (82.78%)
+  Best Val Accuracy : 0.9767  (during training)
+  Macro Precision   : 0.8734
+  Macro Recall      : 0.8278
+  Macro F1-Score    : 0.8228
+  Weighted F1-Score : 0.8228
+
+  Per-class F1-Score (sorted best → worst):
+    EO   Eosinophil              F1=1.0000  n=  15  |████████████████████|
+    PLT  Platelet                F1=1.0000  n=  15  |████████████████████|
+    MYO  Myeloblast              F1=0.9677  n=  15  |███████████████████ |
+    LY   Lymphocyte              F1=0.9333  n=  15  |██████████████████  |
+    ERB  Erythroblast            F1=0.8966  n=  15  |█████████████████   |
+    BNE  Band Neutrophil         F1=0.8750  n=  15  |█████████████████   |
+    SNE  Segmented Neutrophil    F1=0.8571  n=  15  |█████████████████   |
+    BA   Basophil                F1=0.8000  n=  15  |████████████████    |
+    MMY  Metamyelocyte           F1=0.7586  n=  15  |███████████████     |
+    MO   Monocyte                F1=0.7273  n=  15  |██████████████      |
+    PMY  Promyelocyte            F1=0.6364  n=  15  |████████████        |
+    MY   Myelocyte               F1=0.4211  n=  15  |████████            |
+
+----------------------------------------------------------------
+  SO SÁNH VỚI MODEL A (LoRA checkpoint-5500)
+----------------------------------------------------------------
+  Model A — Method         : LoRA (use_dora=False)
+  Model A — Best accuracy  : 95.70%  (step 5400)
+  Model A — Final accuracy : 98.15%  (step 5500)
+  Model A — Final F1 macro : 95.56%
+  Model A — LoRA rank      : r=16, alpha=32
+
+  Model B — Method         : DoRA (use_dora=True)
+  Model B — Val accuracy   : 82.78%
+  Model B — F1 macro       : 82.28%
+  Model B — Rank           : r=8, alpha=16
+
+----------------------------------------------------------------
+  TIMING
+----------------------------------------------------------------
+  Training time        : 396.24 phút  (23774s)
+  Inference time       : 478.35s  (180 images)
+  Avg inference speed  : 2657.5 ms/image
+
+----------------------------------------------------------------
+  OUTPUT FILES
+----------------------------------------------------------------
+    01_training_history.png                            102.3 KB
+    02_confusion_matrix.png                            146.8 KB
+    03_per_class_metrics.png                            61.2 KB
+    04_class_distribution.png                           41.5 KB
+    05_sample_predictions.png                          551.2 KB
+    06_classification_report.csv                         0.5 KB
+
+  📂 HƯỚNG DẪN TÍCH HỢP VÀO HemoAI:
+  Copy thư mục final_model/ vào:
+  custom_models/qwen_blood_cell/23004023_final/
+  Server sẽ tự nhận diện và hiện trong dropdown.
+
+================================================================

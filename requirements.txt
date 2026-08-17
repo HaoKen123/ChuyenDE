@@ -1,0 +1,36 @@
+# =============================================================================
+# IMPORTANT: Install PyTorch with CUDA FIRST before installing this file.
+#
+# RTX 4060 / CUDA 12.x:
+#   uv pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+#
+# CPU only (no GPU):
+#   uv pip install torch torchvision
+#
+# Then install everything else:
+#   uv pip install -r requirements.txt
+# =============================================================================
+
+# Core ML (torch & torchvision installed separately above)
+ultralytics>=8.3.0
+transformers>=4.45.0
+accelerate>=0.34.0
+qwen-vl-utils>=0.0.8
+peft>=0.10.0
+
+# XAI
+grad-cam>=1.5.0
+captum>=0.7.0
+
+# Web Server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
+# Image Processing
+opencv-python>=4.8.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Utilities
+aiofiles>=23.0.0
