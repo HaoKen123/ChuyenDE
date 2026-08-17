@@ -4,10 +4,9 @@ Main API server with all endpoints for the web demo.
 """
 import os
 import sys
-import io
 import base64
 import random
-import time
+import threading
 from pathlib import Path
 from typing import Optional
 
@@ -22,15 +21,21 @@ sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models.yolo_detector import YOLODetector, numpy_to_base64
 from src.models.qwen_classifier import QWenClassifier, CELL_TYPES, CELL_LABELS
+from src.models.model_registry import (
+    DEFAULT_MODEL_ID,
+    ModelRegistryError,
+    public_model_list,
+    resolve_model,
+)
 from src.models.xai_engine import XAIEngine
 
 # ───────────────────────────────────────────────────────────
 # App Setup
 # ───────────────────────────────────────────────────────────
 app = FastAPI(
-    title="Blood Cell Detection & Classification Demo",
-    description="YOLO26 + QWen2.5-VL + XAI for blood cell analysis",
-    version="1.0.0"
+    title="Hệ thống phân tích tế bào máu",
+    description="YOLO26 + Qwen2-VL/Qwen2.5-VL + XAI",
+    version="1.1.0"
 )
 
 app.add_middleware(
@@ -47,6 +52,8 @@ app.add_middleware(
 detector: Optional[YOLODetector] = None
 classifier: Optional[QWenClassifier] = None
 xai_engine: Optional[XAIEngine] = None
+classifier_key: Optional[tuple[str, str, str]] = None
+classifier_lock = threading.RLock()
 
 DATASET_PATH = PROJECT_ROOT / "Dataset-Crop"
 
@@ -68,53 +75,81 @@ def get_detector(model_path=None):
     return detector
 
 
-def _normalize_model_id(model_id: Optional[str]) -> str:
-    if not model_id:
-        return "Qwen/Qwen2.5-VL-3B-Instruct"
-    p = Path(model_id)
-    if p.exists():
-        return str(p.resolve())
-    return model_id
+def unload_classifier() -> None:
+    """Unload the active Qwen model before any registry/model setting switch."""
+    global classifier, classifier_key, xai_engine
+    old_classifier = classifier
+    classifier = None
+    classifier_key = None
+    if xai_engine is not None:
+        xai_engine.set_model(None)
+    if old_classifier is not None:
+        old_classifier.unload()
 
 
-def get_classifier(model_name=None, device=None, compression=None):
-    global classifier, xai_engine
-    
-    # If classifier is already loaded and no specific model/device/compression is requested, return it
-    if classifier is not None and model_name is None and device is None and compression is None:
+def get_classifier(model_id=None, device=None, compression=None):
+    """Resolve a stable model ID and keep at most one Qwen model in memory."""
+    global classifier, classifier_key, xai_engine
+    with classifier_lock:
+        if classifier is not None and model_id is None and device is None and compression is None:
+            return classifier
+        if model_id is None and classifier is not None:
+            requested_id = classifier.model_id
+        else:
+            requested_id = model_id or DEFAULT_MODEL_ID
+        resolved = resolve_model(requested_id)
+        requested_device = device or "auto"
+        if compression:
+            requested_compression = compression
+        elif requested_device == "cpu":
+            requested_compression = "full"
+        else:
+            try:
+                import torch
+
+                requested_compression = "4bit" if torch.cuda.is_available() else "full"
+            except ImportError:
+                requested_compression = "full"
+        target_key = (resolved.model_id, requested_device, requested_compression)
+
+        if classifier is not None and classifier_key == target_key:
+            return classifier
+
+        unload_classifier()
+        print(
+            f"[API] Loading {resolved.display_name} on {requested_device.upper()} "
+            f"with {requested_compression} compression"
+        )
+        try:
+            loaded = QWenClassifier(
+                model_name=resolved.adapter_path,
+                model_id=resolved.model_id,
+                display_name=resolved.display_name,
+                expected_base_model=resolved.base_model,
+                device=requested_device,
+                compression=requested_compression,
+            )
+        except Exception:
+            # The previous model is already gone. Never preserve or reuse partial state.
+            unload_classifier()
+            raise
+
+        classifier = loaded
+        classifier_key = target_key
+        if xai_engine is not None:
+            xai_engine.set_model(classifier.get_vision_encoder(), classifier.device)
+        print(
+            f"[API] Loaded {resolved.architecture}; adapter={resolved.adapter_type}, "
+            f"r={resolved.lora_r}, alpha={resolved.lora_alpha}, dropout={resolved.lora_dropout}"
+        )
         return classifier
-        
-    # If no model requested but we have one loaded, use the current one
-    if model_name is None and classifier is not None:
-        model_name = getattr(classifier, 'model_name', None)
-        
-    if not device:
-        # Use current device if available, otherwise default to cpu
-        device = getattr(classifier, 'device', 'cpu') if classifier else "cpu"
-        
-    if not compression:
-        compression = getattr(classifier, 'compression', '4bit') if classifier else "4bit"
 
-    target_model_id = _normalize_model_id(model_name)
-    current_model_id = _normalize_model_id(getattr(classifier, 'model_name', None)) if classifier else None
-    current_device = getattr(classifier, 'device', None)
-    current_compression = getattr(classifier, 'compression', None)
 
-    if (
-        classifier is None
-        or current_model_id != target_model_id
-        or current_device != device
-        or current_compression != compression
-    ):
-        print(f"[API] Loading QWen classifier: {model_name} (norm: {target_model_id}) on {device.upper()} with {compression} compression")
-        classifier = QWenClassifier(model_name=model_name, device=device, compression=compression)
-        # Reset XAI engine model reference when classifier changes
-        if xai_engine is not None and classifier.model is not None:
-            vision_encoder = classifier.get_vision_encoder()
-            if vision_encoder is not None:
-                xai_engine.set_model(vision_encoder, classifier.device)
-        print(f"[API] QWen classifier loaded. Model: {classifier.model is not None}, Device: {classifier.device}")
-    return classifier
+def classify_with_model(image_input, model_id=None, device=None, compression=None, top_k=3):
+    """Shared resolver/load/inference path used by every classification endpoint."""
+    with classifier_lock:
+        clf = get_classifier(model_id, device=device, compression=compression)
+        return clf.classify(image_input, top_k=top_k)
 
 
 def get_xai_engine():
@@ -146,7 +181,7 @@ async def root():
     index_path = WEB_DIR / "index.html"
     if index_path.exists():
         return FileResponse(str(index_path))
-    return {"message": "Blood Cell Analysis API", "status": "running"}
+    return {"message": "Hệ thống phân tích tế bào máu", "status": "running"}
 
 
 # ───────────────────────────────────────────────────────────
@@ -169,73 +204,35 @@ async def health():
 @app.get("/api/models")
 async def get_models():
     """Get available YOLO and QWen models."""
-    trained_yolo = PROJECT_ROOT / "outputs" / "yolo26_bccd" / "weights" / "best.pt"
-    yolo_models = [{"id": "yolo26n.pt", "name": "YOLO26 Nano (Pretrained Base)"}]
-    if trained_yolo.exists():
-        yolo_models.insert(0, {"id": str(trained_yolo), "name": "YOLO26 Custom (BCCD Fine-tuned)"})
-        
-    # Scan custom YOLO models
+    yolo_models = []
+    seen_ids = set()
+
+    # Priority 1: Check trained YOLO weights from runs / outputs
+    candidate_paths = [
+        PROJECT_ROOT / "runs" / "detect" / "outputs" / "yolo26_bccd" / "weights" / "best.pt",
+        PROJECT_ROOT / "outputs" / "yolo26_bccd" / "weights" / "best.pt",
+        PROJECT_ROOT / "custom_models" / "yolo" / "best.pt",
+    ]
+    for cand in candidate_paths:
+        if cand.exists() and str(cand) not in seen_ids:
+            yolo_models.append({"id": str(cand), "name": "YOLO26 Custom (BCCD Fine-tuned)"})
+            seen_ids.add(str(cand))
+            break
+
+    # Priority 2: Other custom YOLO models in custom_models/yolo
     custom_yolo_dir = PROJECT_ROOT / "custom_models" / "yolo"
     if custom_yolo_dir.exists():
         for pt_file in custom_yolo_dir.glob("*.pt"):
-            yolo_models.append({"id": str(pt_file), "name": f"[Custom] {pt_file.name}"})
+            if str(pt_file) not in seen_ids and pt_file.name != "best.pt":
+                yolo_models.append({"id": str(pt_file), "name": f"[Custom] {pt_file.name}"})
+                seen_ids.add(str(pt_file))
 
-    # Collect QWen checkpoints from outputs and custom_models
-    qwen_models = []
-    ckpt_dirs = []
+    # Priority 3: Pretrained base nano model
+    base_yolo = PROJECT_ROOT / "yolo26n.pt"
+    yolo_models.append({"id": "yolo26n.pt", "name": "YOLO26 Nano (Pretrained Base)"})
 
-    search_dirs = [
-        PROJECT_ROOT / "outputs" / "qwen_blood_cell",
-        PROJECT_ROOT / "custom_models" / "qwen_blood_cell",
-        PROJECT_ROOT / "custom_models" / "qwen",
-        # Tự động scan thêm các thư mục 23004023_* (Model B output từ Kaggle)
-        *list(PROJECT_ROOT.glob("custom_models/23004023_*")),
-        *list(PROJECT_ROOT.glob("custom_models/qwen_blood_cell/23004023_*")),
-    ]
-
-    for s_dir in search_dirs:
-        if not s_dir or not s_dir.exists():
-            continue
-        # Kiểm tra xem thư mục con là adapter trực tiếp hay chứa nhiều checkpoint
-        if (s_dir / "adapter_config.json").exists():
-            # Thư mục chính là adapter (e.g. 23004023_final/)
-            label = s_dir.name
-            is_23004023 = "23004023" in label or "model_b" in label.lower()
-            display = f"[Model B — 23004023] QWen DoRA r=8 ({label})" if is_23004023 else f"QWen LoRA ({label})"
-            ckpt_dirs.append((9999 if is_23004023 else 1, str(s_dir), display))
-            continue
-        for item in s_dir.iterdir():
-            if item.is_dir() and (item / "adapter_config.json").exists():
-                # Extract step number if available
-                step = 0
-                if item.name.startswith("checkpoint-"):
-                    try:
-                        step = int(item.name.split("-")[-1])
-                    except ValueError:
-                        step = 0
-                label = item.name
-                is_23004023 = "23004023" in str(item) or "23004023" in label
-                display = f"[Model B — 23004023] QWen DoRA r=8 ({label})" if is_23004023 else f"QWen LoRA ({label})"
-                ckpt_dirs.append((step, str(item), display))
-
-    # Sort checkpoints by step descending
-    ckpt_dirs.sort(key=lambda x: x[0], reverse=True)
-
-    if ckpt_dirs:
-        # Mark highest step as Best (Model B luôn hiện đầu nếu có)
-        top_step, top_id, top_display = ckpt_dirs[0]
-        if "Model B" in top_display:
-            qwen_models.append({"id": top_id, "name": top_display})
-        else:
-            qwen_models.append({"id": top_id, "name": f"[Best Fine-tuned] QWen LoRA ({Path(top_id).name})"})
-        for step, c_id, c_display in ckpt_dirs[1:]:
-            if "Model B" in c_display:
-                qwen_models.append({"id": c_id, "name": c_display})
-            else:
-                qwen_models.append({"id": c_id, "name": f"QWen LoRA ({Path(c_id).name})"})
-
-    # Always include base model option
-    qwen_models.append({"id": "Qwen/Qwen2.5-VL-3B-Instruct", "name": "QWen2.5-VL-3B-Instruct (Base Model)"})
+    # Fixed registry: no duplicates, clean metadata
+    qwen_models = public_model_list()
 
     return {
         "yolo_models": yolo_models,
@@ -415,8 +412,13 @@ async def crop_and_classify(
         pil_crop = Image.fromarray(crop_rgb)
 
         # Classify
-        clf = get_classifier(qwen_model, device=device, compression=qwen_compression)
-        cls_result = clf.classify(pil_crop, top_k=5)
+        cls_result = classify_with_model(
+            pil_crop,
+            qwen_model,
+            device=device,
+            compression=qwen_compression,
+            top_k=5,
+        )
 
         # Encode crop image for display
         crop_b64 = numpy_to_base64(crop)
@@ -446,8 +448,13 @@ async def classify_cell(
     """
     try:
         contents = await file.read()
-        clf = get_classifier(qwen_model, device=device, compression=qwen_compression)
-        result = clf.classify(contents, top_k=top_k)
+        result = classify_with_model(
+            contents,
+            qwen_model,
+            device=device,
+            compression=qwen_compression,
+            top_k=top_k,
+        )
 
         return {
             "success": True,
@@ -471,8 +478,13 @@ async def classify_sample(
         if not img_path.exists():
             raise HTTPException(404, "Sample not found")
 
-        clf = get_classifier(qwen_model, device=device, compression=qwen_compression)
-        result = clf.classify(str(img_path), top_k=5)
+        result = classify_with_model(
+            str(img_path),
+            qwen_model,
+            device=device,
+            compression=qwen_compression,
+            top_k=5,
+        )
 
         # Add ground truth
         result["ground_truth"] = cell_type
@@ -568,7 +580,7 @@ async def full_pipeline(
             annotated_b64 = numpy_to_base64(detect_result["annotated_image"])
 
         # Step 2 & 3: Classify each crop + XAI
-        clf = get_classifier(qwen_model, device=device, compression=qwen_compression)
+        get_classifier(qwen_model, device=device, compression=qwen_compression)
         engine = get_xai_engine()
         classifications = []
 
@@ -577,7 +589,13 @@ async def full_pipeline(
             crop_img = crop_info["image"]
 
             # Classify
-            cls_result = clf.classify(crop_img, top_k=3)
+            cls_result = classify_with_model(
+                crop_img,
+                qwen_model,
+                device=device,
+                compression=qwen_compression,
+                top_k=3,
+            )
 
             # XAI on crop
             from PIL import Image
@@ -644,10 +662,21 @@ async def compare_models(
 ):
     """
     So sánh kết quả phân loại của 2 model QWen trên cùng 1 ảnh.
-    Trả về top_k predictions, confidence, thời gian inference của mỗi model.
+    Mỗi phía dùng cùng registry/resolver và chỉ trả kết quả inference thật.
     """
+    if not model_a or not model_b:
+        raise HTTPException(status_code=400, detail="Phải chọn đủ hai model để so sánh.")
+    if model_a == model_b:
+        raise HTTPException(status_code=400, detail="Hai phía phải chọn hai model khác nhau.")
     try:
-        import time as _time
+        resolved_models = {
+            "model_a": resolve_model(model_a),
+            "model_b": resolve_model(model_b),
+        }
+    except ModelRegistryError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    try:
         from PIL import Image as _PIL
         import io as _io
 
@@ -655,35 +684,26 @@ async def compare_models(
         pil_image = _PIL.open(_io.BytesIO(contents)).convert("RGB")
 
         results = {}
-        for model_tag, model_id in [("model_a", model_a), ("model_b", model_b)]:
-            if not model_id:
-                results[model_tag] = {
-                    "error": "Chưa chọn model",
-                    "model_id": None,
-                    "success": False
-                }
-                continue
-            t_start = _time.time()
+        for model_tag, resolved in resolved_models.items():
             try:
-                # Tạo classifier riêng cho mỗi lần gọi để đảm bảo đúng model
-                clf_instance = QWenClassifier(
-                    model_name=model_id,
-                    device=device or "cpu",
-                    compression=compression or "4bit"
+                cls_result = classify_with_model(
+                    pil_image,
+                    resolved.model_id,
+                    device=device or "auto",
+                    compression=compression,
+                    top_k=top_k,
                 )
-                cls_result = clf_instance.classify(pil_image, top_k=top_k)
-                inference_ms = int((_time.time() - t_start) * 1000)
                 results[model_tag] = {
                     "success": True,
-                    "model_id": model_id,
-                    "model_name": Path(model_id).name if "/" in model_id or "\\" in model_id else model_id,
-                    "inference_ms": inference_ms,
+                    "model_id": resolved.model_id,
+                    "model_name": resolved.display_name,
                     **cls_result,
                 }
             except Exception as e:
                 results[model_tag] = {
                     "success": False,
-                    "model_id": model_id,
+                    "model_id": resolved.model_id,
+                    "model_name": resolved.display_name,
                     "error": str(e),
                 }
 
