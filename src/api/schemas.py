@@ -14,20 +14,11 @@ class DetectionResult(BaseModel):
     total_cells: int
 
 
-class ClassificationPrediction(BaseModel):
-    class_code: str  # e.g. "LY"
-    class_name: str  # e.g. "Lymphocyte"
-    confidence: float
-    color: str
-
-
 class ClassificationResult(BaseModel):
     predicted_class: Optional[str]
-    class_name: Optional[str]
-    confidence: float
-    top_predictions: List[ClassificationPrediction]
-    description: str
-    color: str
+    raw_output: str
+    model_used: str
+    inference_time_ms: float
 
 
 class XAIResult(BaseModel):

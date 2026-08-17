@@ -4,6 +4,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // API config
     const API_BASE = "http://localhost:8000/api";
     
+    // 12 Cell Types Metadata
+    const CELL_TYPES_DATA = {
+        "BA":  { name: "Basophil", full_name: "Bạch cầu ái kiềm (Basophil)", color: "#6C5CE7", description: "Bạch cầu hạt có hạt bắt màu kiềm đậm, tham gia phản ứng dị ứng." },
+        "BNE": { name: "Band Neutrophil", full_name: "Bạch cầu đoạn trung tính dạng đũa", color: "#0984E3", description: "Bạch cầu trung tính chưa phân đoạn hoàn toàn, nhân hình chữ U hoặc đũa." },
+        "EO":  { name: "Eosinophil", full_name: "Bạch cầu ái toan (Eosinophil)", color: "#E17055", description: "Bạch cầu hạt có các hạt bắt màu acid cam đỏ, chống ký sinh trùng." },
+        "ERB": { name: "Erythroblast", full_name: "Tiền hồng cầu (Erythroblast)", color: "#D63031", description: "Tế bào tiền thân hồng cầu có nhân trong tủy xương." },
+        "LY":  { name: "Lymphocyte", full_name: "Bạch cầu Lympho (Lymphocyte)", color: "#00B894", description: "Tế bào miễn dịch chủ chốt, nhân tròn lớn chiếm gần hết bào tương." },
+        "MMY": { name: "Metamyelocyte", full_name: "Hậu tủy bào (Metamyelocyte)", color: "#FDCB6E", description: "Tế bào tủy dòng hạt giai đoạn sau, nhân bắt đầu lõm hình hạt đậu." },
+        "MO":  { name: "Monocyte", full_name: "Bạch cầu Mono (Monocyte)", color: "#E84393", description: "Bạch cầu kích thước lớn nhất, nhân hình hạt đậu hoặc uốn khúc." },
+        "MY":  { name: "Myelocyte", full_name: "Tủy bào (Myelocyte)", color: "#00CEC9", description: "Tế bào tủy dòng hạt giai đoạn trung gian, nhân tròn hoặc bầu dục." },
+        "MYO": { name: "Myeloblast", full_name: "Nguyên tủy bào (Myeloblast)", color: "#A29BFE", description: "Tế bào gốc non nhất dòng tủy, kích thước lớn có hạt nhân." },
+        "PLT": { name: "Platelet", full_name: "Tiểu cầu (Platelet / Thrombocyte)", color: "#FD79A8", description: "Mảnh tế bào không nhân có vai trò đông cầm máu." },
+        "PMY": { name: "Promyelocyte", full_name: "Tiền tủy bào (Promyelocyte)", color: "#FAB1A0", description: "Giai đoạn kế tiếp nguyên tủy bào, xuất hiện hạt tiên phát." },
+        "SNE": { name: "Segmented Neutrophil", full_name: "Bạch cầu trung tính phân đoạn (SNE)", color: "#74B9FF", description: "Bạch cầu trưởng thành phổ biến nhất, nhân chia 2-5 múi." }
+    };
+
     // Global State
     let selectedCellType = null;
     let yoloFile = null;
@@ -15,6 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let allCropData = [];  // all crop data from detection
     let clsQueue = [];  // queue of crop images to classify (base64 strings)
     let clsQueueIndex = 0;  // current index in queue
+    let qwenModelsById = new Map();
 
     // Initialize SPA Router
     function initRouter() {
@@ -463,6 +480,8 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
             selectedQwenDevice = btn.dataset.device;
             updateClsDeviceBadge(selectedQwenDevice);
+            const compressionSelect = document.getElementById("qwen-compression-select");
+            if (compressionSelect) compressionSelect.value = selectedQwenDevice === "cuda" ? "4bit" : "full";
         });
     });
     updateClsDeviceBadge("cpu");
@@ -544,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const selectedQwenModel = document.getElementById("qwen-model-select")?.value;
             if (selectedQwenModel) {
                 formData.append("qwen_model", selectedQwenModel);
-                addClsLog(`Model được chọn: ${selectedQwenModel.split(/[\\\/]/).pop()}`, "info");
+                addClsLog(`Model được chọn: ${qwenModelsById.get(selectedQwenModel)?.name || selectedQwenModel}`, "info");
             }
 
             formData.append("device", selectedQwenDevice);
@@ -563,45 +582,65 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (data.success) {
                     document.getElementById("cls-results-container").classList.remove("hidden");
-                    
-                    const badge = document.getElementById("cls-badge");
-                    badge.textContent = data.predicted_class;
-                    badge.style.backgroundColor = data.color;
 
-                    document.getElementById("cls-name").textContent = data.class_name;
-                    document.getElementById("cls-confidence").textContent = `${(data.confidence * 100).toFixed(1)}%`;
-                    
-                    const modelUsedSpan = document.getElementById("cls-model-used-text");
-                    if (modelUsedSpan && data.model_used) {
-                        modelUsedSpan.textContent = `| Model: ${data.model_used}`;
+                    const cellInfo = CELL_TYPES_DATA[data.predicted_class] || { name: data.predicted_class || "—", full_name: "Tế bào", color: "#00b894", description: "" };
+
+                    const badge = document.getElementById("cls-badge");
+                    badge.textContent = data.predicted_class || "—";
+                    badge.style.backgroundColor = cellInfo.color || "#00b894";
+
+                    document.getElementById("cls-name").textContent = `${data.predicted_class || "—"} (${cellInfo.name || ""})`;
+                    const descEl = document.getElementById("cls-full-desc");
+                    if (descEl) descEl.textContent = cellInfo.description || "";
+
+                    const confPercent = data.confidence_percent || (data.confidence ? `${(data.confidence * 100).toFixed(1)}%` : "—%");
+                    const confVal = data.confidence ? (data.confidence * 100) : 0;
+
+                    const confBadge = document.getElementById("cls-conf-badge");
+                    if (confBadge) confBadge.textContent = confPercent;
+
+                    const confText = document.getElementById("cls-conf-text");
+                    if (confText) confText.textContent = confPercent;
+
+                    const confBar = document.getElementById("cls-conf-bar");
+                    if (confBar) confBar.style.width = `${Math.min(100, Math.max(0, confVal))}%`;
+
+                    // Render Top Probabilities
+                    const probsList = document.getElementById("cls-probs-list");
+                    if (probsList && data.top_probabilities && data.top_probabilities.length > 0) {
+                        probsList.innerHTML = "";
+                        data.top_probabilities.slice(0, 3).forEach((item, idx) => {
+                            const pPercent = item.percentage || `${(item.probability * 100).toFixed(1)}%`;
+                            const pWidth = Math.min(100, Math.max(0, item.probability * 100));
+                            const pColor = item.color || CELL_TYPES_DATA[item.class]?.color || "#00cec9";
+
+                            const row = document.createElement("div");
+                            row.style.display = "flex";
+                            row.style.alignItems = "center";
+                            row.style.gap = "8px";
+                            row.style.fontSize = "0.8rem";
+                            row.innerHTML = `
+                                <span style="font-weight: 700; width: 32px; color: ${pColor};">${item.class}</span>
+                                <span style="flex: 1; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name || item.full_name}</span>
+                                <div style="flex: 1.5; height: 6px; background: var(--bg-tertiary, #2d3436); border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: ${pWidth}%; background: ${pColor}; border-radius: 3px; transition: width 0.3s ease;"></div>
+                                </div>
+                                <span style="font-weight: 600; width: 44px; text-align: right; color: var(--text-primary);">${pPercent}</span>
+                            `;
+                            probsList.appendChild(row);
+                        });
                     }
 
-                    document.getElementById("cls-desc").textContent = data.description;
-
-                    const probList = document.getElementById("cls-prob-list");
-                    probList.innerHTML = "";
-                    data.top_predictions.forEach(pred => {
-                        const percent = (pred.confidence * 100).toFixed(1);
-                        const progress = document.createElement("div");
-                        progress.className = "progress-bar-container";
-                        progress.innerHTML = `
-                            <div class="progress-label">
-                                <span>${pred.name} (${pred.class})</span>
-                                <strong>${percent}%</strong>
-                            </div>
-                            <div class="progress-bar-bg">
-                                <div class="progress-bar-fill" style="width: ${percent}%; background-color: ${pred.color};"></div>
-                            </div>
-                        `;
-                        probList.appendChild(progress);
-                    });
+                    document.getElementById("cls-raw-output").textContent = data.raw_output || "(trống)";
+                    document.getElementById("cls-model-used-text").textContent = data.model_used || "—";
+                    document.getElementById("cls-inference-time").textContent = `${data.inference_time_ms ?? "—"} ms`;
 
                     if (data.model_used) {
                         addClsLog(`Mô hình thực thi: ${data.model_used}`, "info");
                     }
-                    addClsLog(`Dự đoán: ${data.predicted_class} (${data.class_name})`, "success");
-                    addClsLog(`Độ tin cậy: ${(data.confidence * 100).toFixed(1)}%`, "success");
+                    addClsLog(`Dự đoán: ${data.predicted_class || "Không nhận diện được"} (${confPercent})`, data.predicted_class ? "success" : "warning");
                     addClsLog(`Raw output: ${data.raw_output}`, "info");
+                    addClsLog(`Thời gian inference: ${data.inference_time_ms} ms`, "info");
                     
                     if (data.ground_truth) {
                         const isCorrect = data.is_correct;
@@ -611,9 +650,25 @@ document.addEventListener("DOMContentLoaded", () => {
                             addClsLog(`⚠️ Sai lệch! Dự đoán khác với nhãn thực tế`, "error");
                         }
                     }
+
+                    // Record run to Compare History
+                    const previewImgSrc = document.getElementById("cls-image-preview")?.src;
+                    saveClassificationRun({
+                        image_src: previewImgSrc || "",
+                        model_id: selectedQwenModel,
+                        model_name: data.model_used || qwenModelsById.get(selectedQwenModel)?.name || "QWen Model",
+                        predicted_class: data.predicted_class,
+                        cell_name: cellInfo.name,
+                        color: cellInfo.color,
+                        confidence_percent: confPercent,
+                        top_probabilities: data.top_probabilities || [],
+                        inference_time_ms: data.inference_time_ms,
+                        device: selectedQwenDevice
+                    });
                 } else {
-                    addClsLog(`Lỗi: ${data.error}`, "error");
-                    alert("Phân loại thất bại: " + data.error);
+                    const message = data.error || data.detail || "Lỗi inference không xác định";
+                    addClsLog(`Lỗi: ${message}`, "error");
+                    alert("Phân loại thất bại: " + message);
                 }
             } catch (err) {
                 addClsLog(`Lỗi kết nối: ${err.message}`, "error");
@@ -800,6 +855,8 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.classList.add("active");
             selectedPipeDevice = btn.dataset.device;
             updatePipeDeviceBadge(selectedPipeDevice);
+            const compressionSelect = document.getElementById("pipe-qwen-compression");
+            if (compressionSelect) compressionSelect.value = selectedPipeDevice === "cuda" ? "4bit" : "full";
         });
     });
 
@@ -853,7 +910,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     const cropsList = document.getElementById("pipe-crops-list");
                     cropsList.innerHTML = "";
                     data.classifications.forEach(cell => {
-                        const percent = (cell.classification.confidence * 100).toFixed(1);
                         const item = document.createElement("div");
                         item.className = "crop-pipe-item";
                         item.innerHTML = `
@@ -864,9 +920,10 @@ document.addEventListener("DOMContentLoaded", () => {
                                 <p>Box: [${cell.box.join(", ")}]</p>
                             </div>
                             <div class="crop-pipe-meta">
-                                <h5>QWen Class: <span style="color: ${cell.classification.color}; font-weight:800;">${cell.classification.predicted_class}</span></h5>
-                                <p>${cell.classification.class_name}</p>
-                                <p>Độ tin cậy: ${percent}%</p>
+                                <h5>QWen Class: <strong>${cell.classification.predicted_class || "Không xác định"}</strong></h5>
+                                <p>Raw output: ${cell.classification.raw_output || "(trống)"}</p>
+                                <p>Model: ${cell.classification.model_used}</p>
+                                <p>Inference: ${cell.classification.inference_time_ms} ms</p>
                             </div>
                             <div>
                                 <h5>XAI Explanation</h5>
@@ -969,6 +1026,8 @@ document.addEventListener("DOMContentLoaded", () => {
                         const opt = document.createElement("option");
                         opt.value = m.id;
                         opt.textContent = m.name;
+                        opt.disabled = m.available === false;
+                        if (m.error) opt.title = m.error;
                         select.appendChild(opt);
                     });
                 }
@@ -976,256 +1035,201 @@ document.addEventListener("DOMContentLoaded", () => {
             
             populateSelect("yolo-model-select", data.yolo_models);
             populateSelect("pipe-yolo-model", data.yolo_models);
+            qwenModelsById = new Map(data.qwen_models.map(model => [model.id, model]));
             populateSelect("qwen-model-select", data.qwen_models);
             populateSelect("pipe-qwen-model", data.qwen_models);
-            // Compare page selects
-            populateSelect("compare-model-a-select", data.qwen_models);
-            populateSelect("compare-model-b-select", data.qwen_models);
-            // Auto-select: Model A = checkpoint-5500 (index 0 = best fine-tuned), Model B = base or second
-            const selA = document.getElementById("compare-model-a-select");
-            const selB = document.getElementById("compare-model-b-select");
-            if (selA && data.qwen_models.length > 0) selA.value = data.qwen_models[0].id;
-            if (selB && data.qwen_models.length > 1) selB.value = data.qwen_models[1].id;
-            else if (selB && data.qwen_models.length > 0) selB.value = data.qwen_models[0].id;
         } catch (err) {
             console.error("Error loading models:", err);
         }
     }
 
     // ───────────────────────────────────────────────────────────
-    // COMPARE SECTION — So sánh 2 Models
+    // COMPARE & HISTORY SYSTEM — Lịch sử 3 Mô Hình Gần Nhất
     // ───────────────────────────────────────────────────────────
-    let compareFile = null;
-    let compareDevice = "cpu";
-    let compareInited = false;
-
-    function initCompareSection() {
-        if (compareInited) return;  // Chỉ init 1 lần
-        compareInited = true;
-
-        const dropZone   = document.getElementById("compare-drop-zone");
-        const fileInput  = document.getElementById("compare-file-input");
-        const previewWr  = document.getElementById("compare-preview-wrapper");
-        const previewImg = document.getElementById("compare-preview-img");
-        const removeBtn  = document.getElementById("compare-remove-img");
-        const runBtn     = document.getElementById("compare-run-btn");
-        const chipsEl    = document.getElementById("compare-sample-chips");
-
-        // ── Device toggle ────────────────────────────────────────
-        ["compare-device-cpu", "compare-device-gpu"].forEach(id => {
-            const btn = document.getElementById(id);
-            if (!btn) return;
-            btn.addEventListener("click", () => {
-                compareDevice = btn.dataset.device;
-                document.querySelectorAll("#compare section .device-btn, .compare-action-row .device-btn").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-            });
-        });
-
-        // ── Sample chips ─────────────────────────────────────────
-        const SAMPLE_LABELS = ["LY", "SNE", "MO", "EO", "BA", "PLT", "ERB", "BNE", "MMY", "MY", "MYO", "PMY"];
-        SAMPLE_LABELS.forEach(lbl => {
-            const chip = document.createElement("button");
-            chip.className = "compare-sample-chip";
-            chip.textContent = lbl;
-            chip.title = `Tải mẫu ${lbl} từ dataset`;
-            chip.addEventListener("click", async () => {
-                try {
-                    chip.disabled = true;
-                    chip.textContent = "...";
-                    // Lấy 1 ảnh mẫu ngẫu nhiên từ API
-                    const res = await fetch(`${API_BASE}/samples?cell_type=${lbl}&limit=1`);
-                    const data = await res.json();
-                    if (data.samples && data.samples.length > 0) {
-                        const s = data.samples[0];
-                        const imgUrl = `data:image/jpeg;base64,${s.image_base64}`;
-                        // Convert base64 to File object
-                        const blob = await (await fetch(imgUrl)).blob();
-                        compareFile = new File([blob], `${lbl}_sample.jpg`, { type: "image/jpeg" });
-                        previewImg.src = imgUrl;
-                        previewWr.style.display = "block";
-                        dropZone.style.display = "none";
-                        runBtn.disabled = false;
-                        // Highlight active chip
-                        document.querySelectorAll(".compare-sample-chip").forEach(c => c.classList.remove("active"));
-                        chip.classList.add("active");
-                    }
-                } catch(e) {
-                    console.error("Error loading sample:", e);
-                } finally {
-                    chip.disabled = false;
-                    chip.textContent = lbl;
-                }
-            });
-            chipsEl.appendChild(chip);
-        });
-
-        // ── Dropzone upload ───────────────────────────────────────
-        dropZone.addEventListener("click", () => fileInput.click());
-        dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("drag-over"); });
-        dropZone.addEventListener("dragleave", () => dropZone.classList.remove("drag-over"));
-        dropZone.addEventListener("drop", e => {
-            e.preventDefault();
-            dropZone.classList.remove("drag-over");
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith("image/")) setCompareFile(file);
-        });
-        fileInput.addEventListener("change", () => {
-            if (fileInput.files[0]) setCompareFile(fileInput.files[0]);
-        });
-        removeBtn.addEventListener("click", () => {
-            compareFile = null;
-            previewWr.style.display = "none";
-            dropZone.style.display = "";
-            runBtn.disabled = true;
-            document.querySelectorAll(".compare-sample-chip").forEach(c => c.classList.remove("active"));
-            fileInput.value = "";
-        });
-
-        function setCompareFile(file) {
-            compareFile = file;
-            const reader = new FileReader();
-            reader.onload = e => {
-                previewImg.src = e.target.result;
-                previewWr.style.display = "block";
-                dropZone.style.display = "none";
-                runBtn.disabled = false;
-            };
-            reader.readAsDataURL(file);
+    function getModelCategory(modelId, modelName) {
+        const idLower = (modelId || "").toLowerCase();
+        const nameLower = (modelName || "").toLowerCase();
+        if (idLower.includes("qlora") || idLower.includes("quoc-huy") || nameLower.includes("quốc huy") || nameLower.includes("qlora")) {
+            return "qlora";
         }
-
-        // ── Run compare ───────────────────────────────────────────
-        runBtn.addEventListener("click", runCompare);
+        if (idLower.includes("lora-r16") || idLower.includes("5500") || (nameLower.includes("lora") && !nameLower.includes("dora") && !nameLower.includes("qlora"))) {
+            return "lora";
+        }
+        if (idLower.includes("dora") || idLower.includes("3315") || nameLower.includes("dora") || nameLower.includes("nhật hào")) {
+            return "dora";
+        }
+        return "dora"; // default fallback
     }
 
-    async function runCompare() {
-        if (!compareFile) return;
-
-        const modelA = document.getElementById("compare-model-a-select")?.value;
-        const modelB = document.getElementById("compare-model-b-select")?.value;
-        const loading = document.getElementById("compare-loading");
-        const grid    = document.getElementById("compare-results-grid");
-        const runBtn  = document.getElementById("compare-run-btn");
-
-        loading.style.display = "flex";
-        grid.style.display = "none";
-        runBtn.disabled = true;
-
+    function saveClassificationRun(runData) {
         try {
-            const fd = new FormData();
-            fd.append("file", compareFile);
-            if (modelA) fd.append("model_a", modelA);
-            if (modelB) fd.append("model_b", modelB);
-            fd.append("device", compareDevice);
-            fd.append("compression", "4bit");
-            fd.append("top_k", "5");
+            const timestamp = new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+            const dateStr = new Date().toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" });
+            const category = getModelCategory(runData.model_id, runData.model_name);
 
-            const res  = await fetch(`${API_BASE}/compare`, { method: "POST", body: fd });
-            const data = await res.json();
+            const record = {
+                ...runData,
+                category: category,
+                timestamp: `${timestamp} (${dateStr})`
+            };
 
-            if (!data.success) throw new Error(data.error || "API lỗi");
+            // Save as latest run for this model category
+            localStorage.setItem(`hemoai_latest_${category}`, JSON.stringify(record));
 
-            renderCompareResults(data.results);
-            grid.style.display = "grid";
-        } catch(err) {
-            alert(`Lỗi: ${err.message}`);
-        } finally {
-            loading.style.display = "none";
-            runBtn.disabled = false;
+            // Append to full history list
+            let history = [];
+            try {
+                history = JSON.parse(localStorage.getItem("hemoai_classification_history") || "[]");
+            } catch (e) { history = []; }
+
+            history.unshift(record);
+            if (history.length > 50) history = history.slice(0, 50);
+            localStorage.setItem("hemoai_classification_history", JSON.stringify(history));
+
+            // Refresh compare UI
+            renderCompareHistoryUI();
+        } catch (e) {
+            console.error("Error saving classification run:", e);
         }
     }
 
-    function renderCompareResults(results) {
-        const ra = results.model_a;
-        const rb = results.model_b;
+    function renderCompareHistoryUI() {
+        const categories = [
+            { key: "qlora", bodyId: "body-model-qlora", title: "Quốc Huy — Qwen2-VL-2B (QLoRA)", color: "#6c5ce7" },
+            { key: "lora",  bodyId: "body-model-lora",  title: "LoRA Ckpt-5500 (3B)", color: "#0984e3" },
+            { key: "dora",  bodyId: "body-model-dora",  title: "Nhật Hào — DoRA Ckpt-3315 (3B)", color: "#00b894" }
+        ];
 
-        function fillPanel(res, prefix) {
-            if (!res) return;
-            const nameEl   = document.getElementById(`compare-result-${prefix}-name`);
-            const timeEl   = document.getElementById(`compare-result-${prefix}-time`);
-            const badgeEl  = document.getElementById(`compare-${prefix}-class-badge`);
-            const cellName = document.getElementById(`compare-${prefix}-cell-name`);
-            const confEl   = document.getElementById(`compare-${prefix}-confidence`);
-            const barsEl   = document.getElementById(`compare-${prefix}-bars`);
+        // 1. Render 3 model cards
+        categories.forEach(cat => {
+            const bodyEl = document.getElementById(cat.bodyId);
+            if (!bodyEl) return;
 
-            if (!res.success) {
-                if (nameEl)  nameEl.textContent  = "Lỗi";
-                if (badgeEl) badgeEl.textContent = "ERR";
-                if (cellName) cellName.textContent = res.error || "Không thể tải model";
+            let data = null;
+            try {
+                const stored = localStorage.getItem(`hemoai_latest_${cat.key}`);
+                if (stored) data = JSON.parse(stored);
+            } catch (e) {}
+
+            if (!data) {
+                bodyEl.innerHTML = `
+                    <div class="empty-state-card" style="text-align: center; padding: 24px 12px; color: var(--text-secondary);">
+                        <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                        <p style="font-size: 0.85rem; margin: 0;">Chưa có lượt chạy gần nhất.<br>Hãy chọn model này tại tab <strong>Phân loại</strong> để xem kết quả đối chiếu.</p>
+                    </div>
+                `;
                 return;
             }
 
-            if (nameEl)  nameEl.textContent  = res.model_name || res.model_id || "—";
-            if (timeEl)  timeEl.textContent  = `${res.inference_ms || 0}ms`;
-            if (badgeEl) badgeEl.textContent = res.predicted_class || "?";
-            if (cellName) cellName.textContent = res.class_name || "Unknown";
-            if (confEl)  confEl.textContent  = `${((res.confidence || 0)*100).toFixed(1)}%`;
+            const cellInfo = CELL_TYPES_DATA[data.predicted_class] || { name: data.predicted_class || "—", color: cat.color };
+            const confVal = data.confidence_percent || "—%";
+            const topProbs = data.top_probabilities || [];
 
-            // Confidence bars
-            if (barsEl && res.top_predictions && res.top_predictions.length > 0) {
-                barsEl.innerHTML = "";
-                res.top_predictions.forEach((p, i) => {
-                    const item = document.createElement("div");
-                    item.className = "confidence-bar-item";
-                    const pct = ((p.confidence || 0) * 100).toFixed(1);
-                    const isTop = i === 0;
-                    item.innerHTML = `
-                        <span class="confidence-bar-label">${p.class || p.label || ""}</span>
-                        <div class="confidence-bar-track">
-                            <div class="confidence-bar-fill ${isTop ? 'top' : 'other'}"
-                                 style="width: 0%" data-pct="${p.confidence || 0}"></div>
+            let probsHtml = "";
+            if (topProbs.length > 0) {
+                probsHtml = `
+                    <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-color); font-size: 0.78rem;">
+                        <div style="font-weight: 600; color: var(--text-secondary); margin-bottom: 4px;">Top xác suất (Softmax):</div>
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            ${topProbs.slice(0, 3).map(p => {
+                                const pWidth = Math.min(100, Math.max(0, (p.probability || 0) * 100));
+                                return `
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <span style="font-weight: 700; width: 28px; color: ${p.color || '#00b894'};">${p.class}</span>
+                                        <div style="flex: 1; height: 5px; background: var(--bg-tertiary, #2d3436); border-radius: 3px; overflow: hidden;">
+                                            <div style="height: 100%; width: ${pWidth}%; background: ${p.color || cat.color};"></div>
+                                        </div>
+                                        <span style="font-weight: 600; width: 38px; text-align: right; color: var(--text-primary);">${p.percentage || (p.probability * 100).toFixed(1) + '%'}</span>
+                                    </div>
+                                `;
+                            }).join("")}
                         </div>
-                        <span class="confidence-bar-pct">${pct}%</span>
-                    `;
-                    barsEl.appendChild(item);
-                });
-                // Animate bars
-                setTimeout(() => {
-                    barsEl.querySelectorAll(".confidence-bar-fill").forEach(bar => {
-                        const pctVal = parseFloat(bar.dataset.pct || 0) * 100;
-                        bar.style.width = `${Math.min(100, pctVal)}%`;
-                    });
-                }, 50);
+                    </div>
+                `;
             }
+
+            bodyEl.innerHTML = `
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    ${data.image_src ? `<img src="${data.image_src}" alt="Cell" style="width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">` : ''}
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <span class="result-badge" style="background-color: ${cellInfo.color}; font-size: 0.85rem; padding: 2px 8px; border-radius: 6px;">${data.predicted_class || '—'}</span>
+                            <span class="badge" style="background: rgba(0, 184, 148, 0.15); color: #00b894; font-weight: 700; font-size: 0.85rem;">${confVal}</span>
+                        </div>
+                        <h5 style="margin: 4px 0 2px 0; font-size: 0.95rem;">${cellInfo.name || data.predicted_class || '—'}</h5>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary);">
+                            <span><i class="fa-solid fa-gauge-high"></i> ${data.inference_time_ms ? data.inference_time_ms + ' ms' : '—'}</span>
+                            <span><i class="fa-regular fa-clock"></i> ${data.timestamp || 'Vừa xong'}</span>
+                        </div>
+                    </div>
+                </div>
+                ${probsHtml}
+            `;
+        });
+
+        // 2. Render Full History Table
+        const tbody = document.getElementById("compare-history-tbody");
+        if (!tbody) return;
+
+        let history = [];
+        try {
+            history = JSON.parse(localStorage.getItem("hemoai_classification_history") || "[]");
+        } catch (e) {}
+
+        if (history.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-secondary);">Chưa có dữ liệu lịch sử phân loại. Hãy chạy thử một vài ảnh tại tab Phân loại.</td>
+                </tr>
+            `;
+            return;
         }
 
-        fillPanel(ra, "a");
-        fillPanel(rb, "b");
+        tbody.innerHTML = history.map((item, idx) => {
+            const cellInfo = CELL_TYPES_DATA[item.predicted_class] || { name: item.predicted_class || "—", color: "#00b894" };
+            const methodTag = item.category === "qlora" ? '<span class="badge" style="background: rgba(108, 92, 231, 0.15); color: #6c5ce7;">QLoRA (2B)</span>'
+                            : item.category === "lora"  ? '<span class="badge" style="background: rgba(9, 132, 227, 0.15); color: #0984e3;">LoRA (3B)</span>'
+                            : '<span class="badge" style="background: rgba(0, 184, 148, 0.15); color: #00b894;">DoRA (3B)</span>';
 
-        // ── Winner determination ──────────────────────────────────
-        const winnerCard   = document.getElementById("compare-winner-card");
-        const winnerLabel  = document.getElementById("compare-winner-label");
-        const winnerDetail = document.getElementById("compare-winner-detail");
+            return `
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <td style="padding: 8px 12px; font-size: 0.8rem; color: var(--text-secondary);">${item.timestamp || '—'}</td>
+                    <td style="padding: 8px 12px;">
+                        ${item.image_src ? `<img src="${item.image_src}" alt="Crop" style="width: 36px; height: 36px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border-color);">` : '—'}
+                    </td>
+                    <td style="padding: 8px 12px; font-weight: 500;">${item.model_name || 'QWen'}</td>
+                    <td style="padding: 8px 12px;">${methodTag}</td>
+                    <td style="padding: 8px 12px;">
+                        <span class="result-badge" style="background-color: ${cellInfo.color}; font-size: 0.75rem; padding: 2px 6px; border-radius: 4px;">${item.predicted_class || '—'}</span>
+                        <span style="margin-left: 4px; font-size: 0.8rem; color: var(--text-secondary);">${cellInfo.name || ''}</span>
+                    </td>
+                    <td style="padding: 8px 12px; font-weight: 700; color: #00b894;">${item.confidence_percent || '—'}</td>
+                    <td style="padding: 8px 12px; color: var(--text-secondary);">${item.inference_time_ms ? item.inference_time_ms + ' ms' : '—'}</td>
+                </tr>
+            `;
+        }).join("");
+    }
 
-        if (ra && rb && ra.success && rb.success) {
-            const classA = ra.predicted_class;
-            const classB = rb.predicted_class;
-            const confA  = ra.confidence || 0;
-            const confB  = rb.confidence || 0;
-
-            if (classA === classB) {
-                // Cả 2 đồng ý
-                winnerCard.className  = "compare-winner-card agree";
-                winnerCard.querySelector(".fa-trophy").className = "fa-solid fa-handshake";
-                winnerLabel.textContent  = "Đồng thuận";
-                winnerDetail.textContent = `Cả 2 dự đoán ${classA}`;
-            } else {
-                // Khác nhau → chọn confidence cao hơn
-                const winner = confA >= confB ? "A" : "B";
-                winnerCard.className = "compare-winner-card";
-                winnerCard.querySelector(".fa-handshake, .fa-trophy").className = "fa-solid fa-trophy";
-                winnerLabel.textContent  = `Model ${winner} win`;
-                winnerDetail.textContent = `${(Math.max(confA, confB)*100).toFixed(1)}% conf`;
-            }
-        } else {
-            winnerLabel.textContent = "N/A";
-            winnerDetail.textContent = "Lỗi model";
+    function initCompareSection() {
+        const btnClear = document.getElementById("btn-clear-compare-history");
+        if (btnClear) {
+            btnClear.addEventListener("click", () => {
+                if (confirm("Bạn có chắc chắn muốn xóa toàn bộ lịch sử chạy của các mô hình không?")) {
+                    localStorage.removeItem("hemoai_latest_qlora");
+                    localStorage.removeItem("hemoai_latest_lora");
+                    localStorage.removeItem("hemoai_latest_dora");
+                    localStorage.removeItem("hemoai_classification_history");
+                    renderCompareHistoryUI();
+                }
+            });
         }
+        renderCompareHistoryUI();
     }
 
     // Startup
     initRouter();
     checkHealth();
     loadModels();
+    initCompareSection();
     setInterval(checkHealth, 10000);
 });

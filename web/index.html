@@ -1,24 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hệ thống Phát hiện và Phân loại Tế bào Máu kết hợp XAI</title>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Tailwind CSS for utility fallback, but custom styling in styles.css -->
-    <link rel="stylesheet" href="/static/styles.css?v=3">
+    <link rel="stylesheet" href="/static/styles.css?v=4">
 </head>
 <body>
-    <!-- Background Blur Decorative Blobs -->
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
-
     <!-- App Container -->
     <div class="app-layout">
         
@@ -28,39 +19,31 @@
                 <div class="logo-icon"><i class="fa-solid fa-microscope"></i></div>
                 <div class="logo-text">
                     <h1>HemoAI</h1>
-                    <span>Medical Research Platform</span>
+                    <span>Hệ thống phân tích tế bào máu</span>
                 </div>
             </div>
 
             <nav class="sidebar-menu">
                 <a href="#dashboard" class="menu-item active" data-target="dashboard">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Tổng quan dự án</span>
+                    <span>Tổng quan</span>
                 </a>
                 <a href="#detection" class="menu-item" data-target="detection">
-                    <i class="fa-solid fa-object-group"></i>
-                    <span>Phát hiện (YOLO26)</span>
+                    <span>Phát hiện tế bào</span>
                 </a>
                 <a href="#classification" class="menu-item" data-target="classification">
-                    <i class="fa-solid fa-viruses"></i>
-                    <span>Phân loại (QWen)</span>
+                    <span>Phân loại tế bào</span>
                 </a>
                 <a href="#xai" class="menu-item" data-target="xai">
-                    <i class="fa-solid fa-eye"></i>
-                    <span>Giải thích XAI</span>
+                    <span>Giải thích mô hình</span>
                 </a>
                 <a href="#pipeline" class="menu-item" data-target="pipeline">
-                    <i class="fa-solid fa-diagram-next"></i>
-                    <span>Pipeline Tích hợp</span>
+                    <span>Pipeline</span>
                 </a>
                 <a href="#dataset" class="menu-item" data-target="dataset">
-                    <i class="fa-solid fa-database"></i>
-                    <span>Khám phá Dataset</span>
+                    <span>Dữ liệu</span>
                 </a>
                 <a href="#compare" class="menu-item" data-target="compare">
-                    <i class="fa-solid fa-code-compare"></i>
-                    <span>So sánh Models</span>
-                    <span class="menu-badge">NEW</span>
+                    <span>So sánh mô hình</span>
                 </a>
             </nav>
 
@@ -293,11 +276,11 @@
                                         <div class="cls-top-class" style="margin-bottom: 8px;">
                                             <span class="result-badge" id="crop-cls-badge" style="background-color: rgb(0, 184, 148); width: 44px; height: 44px; font-size: 1rem;">LY</span>
                                             <div>
-                                                <h4 id="crop-cls-name" style="font-size: 0.95rem;">Lymphocyte</h4>
-                                                <p style="font-size: 0.8rem; color: var(--text-secondary);">Độ tin cậy: <strong id="crop-cls-confidence">95.4%</strong></p>
+                                                <h4 id="crop-cls-name" style="font-size: 0.95rem;">Kết quả phân loại</h4>
+                                                <p style="font-size: 0.8rem; color: var(--text-secondary);">Kết quả thật được hiển thị tại mục Phân loại tế bào.</p>
                                             </div>
                                         </div>
-                                        <p class="cell-desc" id="crop-cls-desc" style="font-size: 0.8rem; padding: 8px 12px;">Mô tả...</p>
+                                        <p class="cell-desc" id="crop-cls-desc" style="font-size: 0.8rem; padding: 8px 12px;">Không sử dụng nhãn hoặc độ tin cậy giả.</p>
                                     </div>
                                 </div>
                             </div>
@@ -333,12 +316,8 @@
                         <div class="param-group mt-3">
                             <label for="qwen-compression-select">Chất lượng nén (Quantization):</label>
                             <select id="qwen-compression-select" class="select-input mt-1 w-full">
-                                <option value="2bit">2-bit (Tốc độ cao)</option>
-                                <option value="4bit" selected>4-bit (Mặc định, cân bằng)</option>
-                                <option value="6bit">6-bit (Cân bằng cao)</option>
-                                <option value="8bit">8-bit (Chất lượng cao, nặng)</option>
-                                <option value="16bit">16-bit (Nửa độ chính xác, rất nặng)</option>
-                                <option value="full">Full 32-bit (Không nén)</option>
+                                <option value="4bit" selected>4-bit (GPU CUDA — Tối ưu VRAM)</option>
+                                <option value="full">Full 32-bit (CPU)</option>
                             </select>
                         </div>
 
@@ -351,10 +330,6 @@
                                 <button class="device-btn" data-device="cuda" id="btn-device-cuda">
                                     <i class="fa-brands fa-nvidia"></i> GPU (CUDA)
                                 </button>
-                            </div>
-                            <div class="device-status-badge mt-2" id="device-status-badge">
-                                <span class="dot-cpu"></span>
-                                <span id="device-status-text">Đang dùng: CPU</span>
                             </div>
                         </div>
 
@@ -385,24 +360,43 @@
                                  <img id="cls-image-preview" class="image-preview hidden" src="" alt="Cropped Cell">
                              </div>
                              
-                             <!-- Right: Result data -->
+                             <!-- Right: genuine inference result -->
                              <div class="cls-data-box hidden" id="cls-results-container">
                                  <div class="cls-top-class">
-                                     <span class="result-badge" id="cls-badge" style="background-color: rgb(0, 184, 148);">LY</span>
-                                     <div>
-                                         <h4 id="cls-name">Lymphocyte</h4>
-                                         <p>Độ tin cậy: <strong id="cls-confidence">95.4%</strong> <span id="cls-model-used-text" style="font-size: 0.8rem; color: var(--text-secondary); margin-left: 8px;"></span></p>
+                                     <span class="result-badge" id="cls-badge">—</span>
+                                     <div style="flex: 1;">
+                                         <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                             <h4 id="cls-name" style="margin: 0; font-size: 1.1rem;">Chưa có kết quả</h4>
+                                             <span id="cls-conf-badge" class="badge" style="background: rgba(0, 184, 148, 0.15); color: #00b894; font-weight: 700; font-size: 0.9rem;">—%</span>
+                                         </div>
+                                         <p id="cls-full-desc" style="font-size: 0.8rem; color: var(--text-secondary); margin: 4px 0 0 0;"></p>
                                      </div>
                                  </div>
 
-                                 <p class="cell-desc mt-3" id="cls-desc">Mô tả đặc điểm sinh học...</p>
-
-                                 <div class="prediction-distribution mt-4">
-                                     <h5>Xác suất phân bố (Top 5)</h5>
-                                     <div class="progress-list mt-2" id="cls-prob-list">
-                                         <!-- Loaded by JS -->
+                                 <!-- Real Confidence Score Bar -->
+                                 <div class="cls-confidence-wrapper mt-3">
+                                     <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 4px;">
+                                         <span style="font-weight: 600; color: var(--text-secondary);">Độ tin cậy mô hình (Softmax):</span>
+                                         <span id="cls-conf-text" style="font-weight: 700; color: var(--text-primary);">0.0%</span>
+                                     </div>
+                                     <div class="progress-bar-bg" style="height: 8px; background: var(--bg-tertiary, #2d3436); border-radius: 4px; overflow: hidden;">
+                                         <div id="cls-conf-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #00b894, #00cec9); transition: width 0.4s ease; border-radius: 4px;"></div>
                                      </div>
                                  </div>
+
+                                 <!-- Top 3 Real Probabilities -->
+                                 <div class="cls-top-probs-container mt-3" id="cls-top-probs-container">
+                                     <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">Top xác suất phân loại (Softmax):</div>
+                                     <div id="cls-probs-list" style="display: flex; flex-direction: column; gap: 6px;">
+                                         <!-- Rendered by JS -->
+                                     </div>
+                                 </div>
+
+                                 <dl class="inference-fields mt-3">
+                                     <div><dt>Raw output</dt><dd id="cls-raw-output">—</dd></div>
+                                     <div><dt>Model used</dt><dd id="cls-model-used-text">—</dd></div>
+                                     <div><dt>Inference time</dt><dd id="cls-inference-time">—</dd></div>
+                                 </dl>
                              </div>
                          </div>
                          
@@ -421,27 +415,33 @@
             <section id="xai" class="content-section">
                 <div class="section-header">
                     <h2>Giải thích mô hình trực quan (XAI)</h2>
-                    <p class="section-desc">Trực quan hóa mức độ đóng góp của từng vùng ảnh bằng các phương pháp HiresCAM, XGrad-CAM, EigenCAM và Integrated Gradients.</p>
+                    <p class="section-desc">Trực quan hóa vùng ảnh tác động đến quyết định phân loại tế bào của mô hình QWen.</p>
                 </div>
 
-                <div class="workspace-grid-xai">
-                    <div class="card control-panel-xai">
-                        <h3>Điều khiển XAI</h3>
-                        <div class="upload-area mt-3" id="xai-upload-area">
-                            <i class="fa-solid fa-wand-magic-sparkles upload-icon"></i>
-                            <p>Tải ảnh tế bào để giải thích hoặc <strong>chọn ảnh</strong></p>
+                <div class="workspace-grid">
+                    <div class="card control-panel">
+                        <h3>Tùy chọn giải thích</h3>
+                        
+                        <div class="upload-area mt-4" id="xai-upload-area">
+                            <i class="fa-solid fa-image upload-icon"></i>
+                            <p>Tải ảnh tế bào đơn lẻ (Crop) hoặc <strong>chọn từ máy tính</strong></p>
                             <input type="file" id="xai-file-input" accept="image/*" class="hidden">
                         </div>
 
-                        <div class="param-group mt-3">
-                            <label for="xai-alpha">Độ đậm Heatmap (Alpha Overlay): <span id="xai-alpha-val">0.5</span></label>
-                            <input type="range" id="xai-alpha" min="0.1" max="0.9" step="0.1" value="0.5">
+                        <div class="param-group mt-4">
+                            <label for="xai-method">Phương pháp XAI:</label>
+                            <select id="xai-method" class="select-input mt-1">
+                                <option value="HiResCAM" selected>HiResCAM (Độ phân giải cao)</option>
+                                <option value="XGradCAM">XGrad-CAM (Tập trung)</option>
+                                <option value="EigenCAM">EigenCAM (Không nhiễu)</option>
+                                <option value="IntegratedGradients">Integrated Gradients (Chính xác pixel)</option>
+                            </select>
                         </div>
 
-                        <div class="mt-3">
-                            <label>Chọn lớp tế bào mục tiêu giải thích:</label>
+                        <div class="param-group mt-3">
+                            <label for="xai-target-class">Lớp mục tiêu giải thích:</label>
                             <select id="xai-target-class" class="select-input mt-1">
-                                <option value="">Tự động (Lớp dự đoán cao nhất)</option>
+                                <option value="auto" selected>Tự động (Lớp mô hình dự đoán)</option>
                                 <option value="BA">Basophil (BA)</option>
                                 <option value="BNE">Band Neutrophil (BNE)</option>
                                 <option value="EO">Eosinophil (EO)</option>
@@ -457,69 +457,72 @@
                             </select>
                         </div>
 
-                        <div class="flex gap-2 mt-4">
-                            <button class="btn btn-primary flex-1" id="btn-run-xai">
-                                <i class="fa-solid fa-bolt"></i> Tạo Heatmap
-                            </button>
-                            <button class="btn btn-success flex-1" id="btn-run-xai-all">
-                                <i class="fa-solid fa-grid-2"></i> So sánh 4 Methods
-                            </button>
+                        <div class="param-group mt-3">
+                            <label for="xai-alpha">Độ trong suốt Heatmap: <span id="xai-alpha-val">0.5</span></label>
+                            <input type="range" id="xai-alpha" min="0.1" max="0.9" step="0.05" value="0.5">
                         </div>
 
-                        <div class="divider">CHỌN ẢNH MẪU ĐỂ XEM XAI</div>
-                        <div class="sample-grid" id="xai-samples">
-                            <!-- Loaded from JS -->
+                        <button class="btn btn-xai w-full mt-4" id="btn-run-xai">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bản đồ giải thích
+                        </button>
+                        <button class="btn btn-primary w-full mt-2" id="btn-run-all-xai" style="background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary);">
+                            <i class="fa-solid fa-layer-group"></i> So sánh tất cả phương pháp
+                        </button>
+
+                        <div class="divider">HOẶC CHỌN ẢNH MẪU</div>
+                        <div class="sample-grid grid-cols-4 gap-2" id="xai-samples">
+                            <!-- Samples loaded via JS -->
                         </div>
                     </div>
 
-                    <div class="card viewer-panel-xai">
-                        <h3>Màn hình so sánh XAI</h3>
-                        <div class="xai-display-grid mt-3" id="xai-grid">
-                            <!-- Single View / Grid view loaded dynamically -->
-                            <div class="no-image w-full h-full" id="xai-no-image">
+                    <div class="card viewer-panel">
+                        <h3>Kết quả giải thích trực quan</h3>
+                        <div class="xai-display-grid mt-4" id="xai-grid">
+                            <div class="no-image" id="xai-no-image" style="grid-column: span 2;">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                <span>Chưa tạo kết quả giải thích XAI</span>
+                                <span>Chưa tạo bản đồ giải thích</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Pipeline Section -->
+            <!-- Pipeline Full Section -->
             <section id="pipeline" class="content-section">
                 <div class="section-header">
-                    <h2>Pipeline Tích hợp (Detect &rarr; Classify &rarr; XAI)</h2>
-                    <p class="section-desc">Chạy toàn bộ quy trình: YOLO26 phát hiện &rarr; Tự động cắt ảnh &rarr; QWen phân loại &rarr; XAI giải thích quyết định.</p>
+                    <h2>Quy trình phân tích tự động toàn diện (End-to-End Pipeline)</h2>
+                    <p class="section-desc">Tự động phát hiện tế bào bằng YOLO26, cắt từng vùng tế bào, phân loại bằng QWen và giải thích bằng XAI.</p>
                 </div>
 
-                <div class="pipeline-workspace">
-                    <div class="card control-pipeline-panel">
-                        <h3>Điều khiển luồng tích hợp</h3>
+                <div class="workspace-grid">
+                    <div class="card control-panel">
+                        <h3>Cấu hình luồng xử lý</h3>
+                        
                         <div class="upload-area mt-4" id="pipe-upload-area">
-                            <i class="fa-solid fa-folder-open upload-icon"></i>
-                            <p>Kéo thả ảnh blood smear tiêu bản thô tại đây</p>
+                            <i class="fa-solid fa-file-waveform upload-icon"></i>
+                            <p>Tải ảnh tiêu bản toàn cảnh hoặc <strong>chọn từ máy tính</strong></p>
                             <input type="file" id="pipe-file-input" accept="image/*" class="hidden">
                         </div>
 
-                        <div class="param-group mt-3">
-                            <label for="pipe-yolo-model">Model YOLO:</label>
+                        <div class="param-group mt-4">
+                            <label for="pipe-yolo-model">Chọn Model YOLO:</label>
                             <select id="pipe-yolo-model" class="select-input mt-1 w-full"></select>
                         </div>
 
                         <div class="param-group mt-3">
-                            <label for="pipe-qwen-model">Model QWen:</label>
+                            <label for="pipe-qwen-model">Chọn Model QWen:</label>
                             <select id="pipe-qwen-model" class="select-input mt-1 w-full"></select>
                         </div>
 
                         <div class="param-group mt-3">
-                            <label for="pipe-conf">Ngưỡng tự tin phát hiện: <span id="pipe-conf-val">0.25</span></label>
-                            <input type="range" id="pipe-conf" min="0.1" max="0.9" step="0.05" value="0.25">
+                            <label for="pipe-yolo-conf">Ngưỡng tự tin YOLO: <span id="pipe-yolo-conf-val">0.25</span></label>
+                            <input type="range" id="pipe-yolo-conf" min="0.1" max="0.9" step="0.05" value="0.25">
                         </div>
 
                         <div class="param-group mt-3">
-                            <label for="pipe-xai-method">Giải thích XAI cho các tế bào cắt ra:</label>
+                            <label for="pipe-xai-method">Phương pháp XAI:</label>
                             <select id="pipe-xai-method" class="select-input mt-1">
-                                <option value="HiResCAM">HiResCAM (Độ phân giải cao)</option>
+                                <option value="HiResCAM" selected>HiResCAM (Độ phân giải cao)</option>
                                 <option value="XGradCAM">XGrad-CAM (Tập trung)</option>
                                 <option value="EigenCAM">EigenCAM (Không nhiễu)</option>
                                 <option value="IntegratedGradients">Integrated Gradients (Chính xác pixel)</option>
@@ -529,12 +532,8 @@
                         <div class="param-group mt-3">
                             <label for="pipe-qwen-compression">Chất lượng nén QWen:</label>
                             <select id="pipe-qwen-compression" class="select-input mt-1 w-full">
-                                <option value="2bit">2-bit (Tốc độ cao)</option>
-                                <option value="4bit" selected>4-bit (Mặc định, cân bằng)</option>
-                                <option value="6bit">6-bit (Cân bằng cao)</option>
-                                <option value="8bit">8-bit (Chất lượng cao, nặng)</option>
-                                <option value="16bit">16-bit (Nửa độ chính xác, rất nặng)</option>
-                                <option value="full">Full 32-bit (Không nén)</option>
+                                <option value="4bit" selected>4-bit (GPU CUDA — Tối ưu VRAM)</option>
+                                <option value="full">Full 32-bit (CPU)</option>
                             </select>
                         </div>
 
@@ -548,46 +547,44 @@
                                     <i class="fa-brands fa-nvidia"></i> GPU (CUDA)
                                 </button>
                             </div>
-                            <div class="device-status-badge mt-2" id="pipe-device-status-badge">
-                                <span class="dot-cpu"></span>
-                                <span id="pipe-device-status-text">Đang dùng: CPU</span>
-                            </div>
                         </div>
 
                         <button class="btn btn-primary w-full mt-4" id="btn-run-pipeline">
-                            <i class="fa-solid fa-gears"></i> Chạy Pipeline
+                            <i class="fa-solid fa-bolt"></i> Chạy toàn bộ Pipeline
                         </button>
                     </div>
 
-                    <div class="card viewer-pipeline-panel">
-                        <h3>Tiến trình Pipeline</h3>
-                        
-                        <div class="pipeline-results-layout mt-3">
-                            <div class="pipeline-status-empty" id="pipe-empty">
-                                <i class="fa-solid fa-rotate"></i>
-                                <span>Chưa chạy quy trình tích hợp</span>
+                    <div class="card viewer-panel">
+                        <h3>Kết quả luồng phân tích</h3>
+                        <div class="pipe-progress-steps mt-4">
+                            <div class="pipe-step" id="step-detect">
+                                <span class="step-icon"><i class="fa-solid fa-object-group"></i></span>
+                                <span>1. Phát hiện YOLO</span>
                             </div>
+                            <div class="pipe-step-line"></div>
+                            <div class="pipe-step" id="step-crop">
+                                <span class="step-icon"><i class="fa-solid fa-crop-simple"></i></span>
+                                <span>2. Cắt tế bào</span>
+                            </div>
+                            <div class="pipe-step-line"></div>
+                            <div class="pipe-step" id="step-classify">
+                                <span class="step-icon"><i class="fa-solid fa-brain"></i></span>
+                                <span>3. QWen phân loại</span>
+                            </div>
+                            <div class="pipe-step-line"></div>
+                            <div class="pipe-step" id="step-xai">
+                                <span class="step-icon"><i class="fa-solid fa-eye"></i></span>
+                                <span>4. Giải thích XAI</span>
+                            </div>
+                        </div>
 
-                            <div class="pipe-results-container hidden" id="pipe-results">
-                                <!-- Stage 1: Detect Output -->
-                                <div class="stage-section">
-                                    <h4>Giai đoạn 1: YOLO26 Detect & Localization</h4>
-                                    <div class="pipe-detect-viewer mt-2">
-                                        <img id="pipe-det-img" src="" alt="YOLO Detections">
-                                        <div class="pipe-summary-card">
-                                            <h5>Summary Detections</h5>
-                                            <ul id="pipe-summary-list"></ul>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Stage 2: Crops & Qwen Classification -->
-                                <div class="stage-section mt-5">
-                                    <h4>Giai đoạn 2 & 3: QWen Classification & XAI Explanation</h4>
-                                    <div class="crops-list mt-3" id="pipe-crops-list">
-                                        <!-- Loaded by JS -->
-                                    </div>
-                                </div>
+                        <div class="pipe-results-content mt-4" id="pipe-results-area">
+                            <div class="no-image" id="pipe-no-image">
+                                <i class="fa-solid fa-diagram-project"></i>
+                                <span>Chưa chạy Pipeline</span>
+                            </div>
+                            <div class="pipe-details hidden" id="pipe-details-container">
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
                     </div>
@@ -597,207 +594,146 @@
             <!-- Dataset Section -->
             <section id="dataset" class="content-section">
                 <div class="section-header">
-                    <h2>Khám phá Tập dữ liệu (12 lớp)</h2>
-                    <p class="section-desc">Chi tiết cấu trúc 12 loại tế bào máu trong tập dữ liệu Dataset-Crop được dùng để phát hiện, phân loại.</p>
+                    <h2>Khám phá tập dữ liệu 12 lớp tế bào máu</h2>
+                    <p class="section-desc">Tổng hợp hình ảnh và thông tin y khoa chi tiết của 12 dòng tế bào máu trong tập dữ liệu BCCD.</p>
                 </div>
 
                 <div class="dataset-grid">
-                    <!-- Left: List -->
-                    <div class="card dataset-list-card">
-                        <h3>Danh mục 12 loại tế bào</h3>
-                        <div class="cell-type-list mt-3" id="dataset-types-list">
-                            <!-- Loaded from JS -->
+                    <div class="card">
+                        <h3>Danh mục 12 phân lớp tế bào</h3>
+                        <div class="cell-list mt-3" id="dataset-cell-list">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
 
-                    <!-- Right: Explorer -->
-                    <div class="card dataset-explorer-card">
-                        <h3 id="dataset-detail-title">Chọn loại tế bào để xem đặc điểm</h3>
-                        
-                        <div class="dataset-detail-content mt-3 hidden" id="dataset-detail">
-                            <div class="badge-detail" id="detail-code">LY</div>
-                            <h4 class="mt-2" id="detail-name">Lymphocyte</h4>
-                            <p class="mt-2 text-secondary" id="detail-desc">Mô tả chi tiết sinh học của loại tế bào này.</p>
-                            
-                            <div class="detail-samples-section mt-4">
-                                <h5>Ảnh mẫu thực tế trong Tập dữ liệu (Dataset-Crop)</h5>
-                                <div class="detail-samples-grid mt-2" id="detail-samples">
-                                    <!-- Dynamic images -->
+                    <div class="card viewer-panel">
+                        <h3>Thông tin chi tiết</h3>
+                        <div class="no-selection" id="dataset-no-select">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                            <span>Chọn một loại tế bào từ danh sách bên trái</span>
+                        </div>
+                        <div class="cell-detail-view hidden" id="dataset-detail">
+                            <div class="detail-header">
+                                <span class="result-badge" id="detail-code">LY</span>
+                                <div>
+                                    <h3 id="detail-name">Lymphocyte</h3>
+                                    <span class="text-secondary text-sm" id="detail-count">0 mẫu trong tập dữ liệu</span>
                                 </div>
                             </div>
-                        </div>
+                            <p class="cell-desc mt-3" id="detail-desc"></p>
 
-                        <div class="no-selection" id="dataset-no-select">
-                            <i class="fa-solid fa-database"></i>
-                            <span>Bấm vào một loại tế bào bên trái để xem hình ảnh mẫu và thông tin chi tiết.</span>
+                            <h4 class="mt-4">Ảnh mẫu trong tập dữ liệu</h4>
+                            <div class="dataset-samples-grid mt-2" id="detail-samples">
+                                <!-- Sample images loaded dynamically -->
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- ═══════════════════════════════════════════════════════ -->
-            <!-- So sánh Models Section                                 -->
+            <!-- COMPARE SECTION — Đối chiếu Lịch sử 3 Mô Hình Gần Nhất -->
             <!-- ═══════════════════════════════════════════════════════ -->
             <section id="compare" class="content-section">
                 <div class="section-header">
-                    <span class="badge">Model B — 23004023</span>
-                    <h2>So sánh 2 Mô hình QWen</h2>
-                    <p>Chạy cùng 1 ảnh tế bào qua 2 model và so sánh kết quả phân loại, confidence, thời gian inference side-by-side.</p>
-                </div>
-
-                <!-- Model Selection Row -->
-                <div class="compare-config-row">
-                    <!-- Model A -->
-                    <div class="card compare-model-config" id="compare-model-a-card">
-                        <div class="compare-model-header">
-                            <span class="compare-model-badge model-a-badge">Model A</span>
-                            <h4>Model A — Checkpoint-5500</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div>
+                            <h2>Đối chiếu lịch sử 3 mô hình đã chạy</h2>
+                            <p class="section-desc">Tự động lưu và so sánh kết quả dự đoán gần nhất của 3 mô hình QWen (Quốc Huy QLoRA, LoRA Ckpt-5500, Nhật Hào DoRA) từ tab Phân loại.</p>
                         </div>
-                        <div class="form-group mt-2">
-                            <label class="form-label">Chọn Model A</label>
-                            <select id="compare-model-a-select" class="form-select">
-                                <option value="">-- Đang tải danh sách... --</option>
-                            </select>
-                        </div>
-                        <div class="compare-model-meta" id="compare-model-a-meta">
-                            <span class="meta-chip"><i class="fa-solid fa-circle-info"></i> r=16 | alpha=32 | dropout=0.2</span>
-                        </div>
-                    </div>
-
-                    <div class="compare-vs-divider">
-                        <span>VS</span>
-                    </div>
-
-                    <!-- Model B -->
-                    <div class="card compare-model-config" id="compare-model-b-card">
-                        <div class="compare-model-header">
-                            <span class="compare-model-badge model-b-badge">Model B</span>
-                            <h4>Model B — 23004023</h4>
-                        </div>
-                        <div class="form-group mt-2">
-                            <label class="form-label">Chọn Model B</label>
-                            <select id="compare-model-b-select" class="form-select">
-                                <option value="">-- Đang tải danh sách... --</option>
-                            </select>
-                        </div>
-                        <div class="compare-model-meta" id="compare-model-b-meta">
-                            <span class="meta-chip"><i class="fa-solid fa-circle-info"></i> r=8 | alpha=16 | dropout=0.1 | aug mạnh</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Image Upload -->
-                <div class="card compare-upload-card mt-3">
-                    <h3><i class="fa-solid fa-image"></i> Ảnh tế bào cần phân loại</h3>
-                    <div class="compare-upload-row mt-3">
-                        <div class="compare-dropzone" id="compare-drop-zone">
-                            <div class="upload-icon-wrapper">
-                                <i class="fa-solid fa-cloud-arrow-up"></i>
-                            </div>
-                            <p>Kéo thả hoặc <strong>click</strong> để chọn ảnh tế bào (đã crop)</p>
-                            <span class="upload-hint">JPG, PNG, WebP • Kích thước tối ưu 224×224px</span>
-                            <input type="file" id="compare-file-input" accept="image/*" style="display:none">
-                        </div>
-                        <div class="compare-preview-wrapper" id="compare-preview-wrapper" style="display:none">
-                            <img id="compare-preview-img" src="" alt="Preview" class="compare-preview-img">
-                            <button class="btn-remove-compare" id="compare-remove-img" title="Xóa ảnh">
-                                <i class="fa-solid fa-xmark"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Sample buttons -->
-                    <div class="compare-samples-row mt-3">
-                        <span class="samples-label">Hoặc chọn mẫu nhanh:</span>
-                        <div class="compare-sample-chips" id="compare-sample-chips">
-                            <!-- Populated by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Device + Run -->
-                    <div class="compare-action-row mt-3">
-                        <div class="device-toggle-group">
-                            <label class="form-label">Thiết bị</label>
-                            <div class="device-btn-group">
-                                <button class="device-btn active" id="compare-device-cpu" data-device="cpu">CPU</button>
-                                <button class="device-btn" id="compare-device-gpu" data-device="cuda">GPU (CUDA)</button>
-                            </div>
-                        </div>
-                        <button class="btn-primary-large" id="compare-run-btn" disabled>
-                            <i class="fa-solid fa-balance-scale"></i>
-                            So sánh 2 Models
+                        <button class="btn btn-sm" id="btn-clear-compare-history" style="padding: 6px 14px; font-size: 0.8rem; background: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 8px; cursor: pointer;">
+                            <i class="fa-solid fa-trash-can"></i> Xóa lịch sử
                         </button>
                     </div>
                 </div>
 
-                <!-- Results Side-by-Side -->
-                <div class="compare-results-grid mt-4" id="compare-results-grid" style="display:none">
-                    <!-- Model A Result -->
-                    <div class="card compare-result-card" id="compare-result-a">
-                        <div class="result-card-header">
-                            <span class="compare-model-badge model-a-badge">Model A</span>
-                            <span class="result-model-name" id="compare-result-a-name">—</span>
-                            <span class="inference-time-badge" id="compare-result-a-time">—ms</span>
-                        </div>
-
-                        <div class="compare-prediction-hero" id="compare-result-a-hero">
-                            <div class="predicted-cell-badge" id="compare-a-class-badge"></div>
-                            <div class="predicted-cell-info">
-                                <div class="predicted-cell-name" id="compare-a-cell-name"></div>
-                                <div class="predicted-confidence" id="compare-a-confidence"></div>
+                <!-- 3 Models Side-by-Side Cards -->
+                <div class="compare-3models-grid mt-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+                    <!-- Card 1: Quoc Huy QLoRA -->
+                    <div class="card compare-model-card" id="card-model-qlora" style="border-top: 4px solid #6c5ce7; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <span class="badge" style="background: rgba(108, 92, 231, 0.2); color: #6c5ce7; font-weight: 700;">QLoRA · 2B</span>
+                                <h4 style="margin: 6px 0 2px 0; font-size: 1rem;">Quốc Huy — Qwen2-VL-2B</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">QLoRA (r=8, α=16) · Final</p>
                             </div>
+                            <span class="status-indicator online" style="margin: 0;"><span class="dot"></span></span>
                         </div>
-
-                        <div class="confidence-bar-section mt-3">
-                            <h5>Top-5 Predictions</h5>
-                            <div class="confidence-bars" id="compare-a-bars"></div>
+                        <div class="compare-card-body" id="body-model-qlora">
+                            <div class="empty-state-card" style="text-align: center; padding: 24px 12px; color: var(--text-secondary);">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                                <p style="font-size: 0.85rem; margin: 0;">Chưa có lượt chạy gần nhất.<br>Hãy chọn model này tại tab <strong>Phân loại</strong> để xem kết quả đối chiếu.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Winner Badge (center) -->
-                    <div class="compare-winner-col" id="compare-winner-col">
-                        <div class="compare-winner-card" id="compare-winner-card">
-                            <i class="fa-solid fa-trophy"></i>
-                            <div class="winner-label" id="compare-winner-label">Đang tính...</div>
-                            <div class="winner-detail" id="compare-winner-detail"></div>
+                    <!-- Card 2: LoRA Checkpoint 5500 -->
+                    <div class="card compare-model-card" id="card-model-lora" style="border-top: 4px solid #0984e3; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <span class="badge" style="background: rgba(9, 132, 227, 0.2); color: #0984e3; font-weight: 700;">LoRA · 3B</span>
+                                <h4 style="margin: 6px 0 2px 0; font-size: 1rem;">LoRA Ckpt-5500</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Qwen2.5-VL-3B · LoRA (r=16, α=32)</p>
+                            </div>
+                            <span class="status-indicator online" style="margin: 0;"><span class="dot"></span></span>
+                        </div>
+                        <div class="compare-card-body" id="body-model-lora">
+                            <div class="empty-state-card" style="text-align: center; padding: 24px 12px; color: var(--text-secondary);">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                                <p style="font-size: 0.85rem; margin: 0;">Chưa có lượt chạy gần nhất.<br>Hãy chọn model này tại tab <strong>Phân loại</strong> để xem kết quả đối chiếu.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Model B Result -->
-                    <div class="card compare-result-card" id="compare-result-b">
-                        <div class="result-card-header">
-                            <span class="compare-model-badge model-b-badge">Model B</span>
-                            <span class="result-model-name" id="compare-result-b-name">—</span>
-                            <span class="inference-time-badge" id="compare-result-b-time">—ms</span>
-                        </div>
-
-                        <div class="compare-prediction-hero" id="compare-result-b-hero">
-                            <div class="predicted-cell-badge" id="compare-b-class-badge"></div>
-                            <div class="predicted-cell-info">
-                                <div class="predicted-cell-name" id="compare-b-cell-name"></div>
-                                <div class="predicted-confidence" id="compare-b-confidence"></div>
+                    <!-- Card 3: Nhat Hao DoRA Checkpoint 3315 -->
+                    <div class="card compare-model-card" id="card-model-dora" style="border-top: 4px solid #00b894; position: relative;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <span class="badge" style="background: rgba(0, 184, 148, 0.2); color: #00b894; font-weight: 700;">DoRA · 3B ⭐</span>
+                                <h4 style="margin: 6px 0 2px 0; font-size: 1rem;">Nhật Hào — DoRA Ckpt-3315</h4>
+                                <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">Qwen2.5-VL-3B · DoRA (r=8, α=16) Mới nhất</p>
                             </div>
+                            <span class="status-indicator online" style="margin: 0;"><span class="dot"></span></span>
                         </div>
-
-                        <div class="confidence-bar-section mt-3">
-                            <h5>Top-5 Predictions</h5>
-                            <div class="confidence-bars" id="compare-b-bars"></div>
+                        <div class="compare-card-body" id="body-model-dora">
+                            <div class="empty-state-card" style="text-align: center; padding: 24px 12px; color: var(--text-secondary);">
+                                <i class="fa-solid fa-clock-rotate-left" style="font-size: 1.8rem; margin-bottom: 8px; opacity: 0.5;"></i>
+                                <p style="font-size: 0.85rem; margin: 0;">Chưa có lượt chạy gần nhất.<br>Hãy chọn model này tại tab <strong>Phân loại</strong> để xem kết quả đối chiếu.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Loading overlay -->
-                <div class="compare-loading" id="compare-loading" style="display:none">
-                    <div class="loading-spinner"></div>
-                    <p>Đang chạy inference trên 2 models... <br><small>Có thể mất 30-60 giây tùy thiết bị</small></p>
+                <!-- Recent Runs History Table -->
+                <div class="card mt-4">
+                    <h4 style="margin-bottom: 12px;"><i class="fa-solid fa-list-ul" style="color: var(--color-primary);"></i> Lịch sử tất cả các lượt chạy gần đây</h4>
+                    <div style="overflow-x: auto;">
+                        <table class="history-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-secondary);">
+                                    <th style="padding: 10px 12px;">Thời gian</th>
+                                    <th style="padding: 10px 12px;">Ảnh tế bào</th>
+                                    <th style="padding: 10px 12px;">Mô hình</th>
+                                    <th style="padding: 10px 12px;">Thuật toán</th>
+                                    <th style="padding: 10px 12px;">Lớp dự đoán</th>
+                                    <th style="padding: 10px 12px;">Độ tin cậy (%)</th>
+                                    <th style="padding: 10px 12px;">Thời gian xử lý</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compare-history-tbody">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; padding: 24px; color: var(--text-secondary);">Chưa có dữ liệu lịch sử phân loại.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-
             </section>
 
         </main>
     </div>
 
     <!-- JavaScript logic -->
-    <script src="/static/app.js?v=3"></script>
+    <script src="/static/app.js?v=5"></script>
 </body>
 </html>
