@@ -12,7 +12,7 @@ from typing import Any
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_MODEL_ID = "quoc-huy-qwen2-vl-2b-qlora-r8-final"
+DEFAULT_MODEL_ID = "qwen2.5-vl-3b-dora-r8-checkpoint-3315"
 
 
 class ModelRegistryError(RuntimeError):
