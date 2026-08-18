@@ -948,7 +948,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Dataset Explorer Logic
     // ───────────────────────────────────────────────────────────
     async function loadDatasetExplorer() {
-        const listContainer = document.getElementById("dataset-types-list");
+        const listContainer = document.getElementById("dataset-cell-list") || document.getElementById("dataset-types-list");
         if (!listContainer) return;
 
         try {
@@ -956,9 +956,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await res.json();
 
             listContainer.innerHTML = "";
-            data.cell_types.forEach(cell => {
+            let firstCell = null;
+            data.cell_types.forEach((cell, idx) => {
+                if (idx === 0) firstCell = cell;
                 const item = document.createElement("div");
-                item.className = "cell-type-item";
+                item.className = "cell-type-item" + (idx === 0 ? " active" : "");
                 item.dataset.code = cell.code;
                 item.innerHTML = `
                     <div class="cell-type-left">
@@ -966,7 +968,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <strong>${cell.code}</strong>
                         <span>- ${cell.name}</span>
                     </div>
-                    <span class="cell-count-badge">${cell.sample_count} ảnh</span>
+                    <span class="cell-count-badge">${cell.sample_count} mẫu</span>
                 `;
                 item.addEventListener("click", () => {
                     document.querySelectorAll(".cell-type-item").forEach(i => i.classList.remove("active"));
@@ -975,38 +977,59 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
                 listContainer.appendChild(item);
             });
+
+            // Automatically show first cell details
+            if (firstCell) {
+                showCellDetail(firstCell);
+            }
         } catch (err) {
             console.error("Error loading dataset explorer:", err);
+            listContainer.innerHTML = '<p class="text-danger" style="padding: 12px;">Lỗi tải danh mục tế bào từ API.</p>';
         }
     }
 
     async function showCellDetail(cell) {
-        document.getElementById("dataset-no-select").classList.add("hidden");
+        const noSel = document.getElementById("dataset-no-select");
+        if (noSel) noSel.classList.add("hidden");
         const detail = document.getElementById("dataset-detail");
-        detail.classList.remove("hidden");
+        if (detail) detail.classList.remove("hidden");
 
         const badge = document.getElementById("detail-code");
-        badge.textContent = cell.code;
-        badge.style.backgroundColor = cell.color;
+        if (badge) {
+            badge.textContent = cell.code;
+            badge.style.backgroundColor = cell.color || "#00b894";
+        }
 
-        document.getElementById("detail-name").textContent = cell.full_name;
-        document.getElementById("detail-desc").textContent = cell.description;
+        const nameEl = document.getElementById("detail-name");
+        if (nameEl) nameEl.textContent = `${cell.name} (${cell.full_name || cell.code})`;
+
+        const countEl = document.getElementById("detail-count");
+        if (countEl) countEl.textContent = `${cell.sample_count || 0} mẫu trong tập dữ liệu`;
+
+        const descEl = document.getElementById("detail-desc");
+        if (descEl) descEl.textContent = cell.description || "";
 
         const samplesGrid = document.getElementById("detail-samples");
-        samplesGrid.innerHTML = '<i class="fa-solid fa-spinner fa-spin col-span-4 text-center"></i>';
+        if (!samplesGrid) return;
+        samplesGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 24px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--color-primary);"></i><p style="margin-top: 8px; font-size: 0.85rem; color: var(--text-secondary);">Đang tải ảnh mẫu tế bào...</p></div>';
 
         try {
             const res = await fetch(`${API_BASE}/samples?cell_type=${cell.code}&limit=8`);
             const data = await res.json();
             samplesGrid.innerHTML = "";
-            data.samples.forEach(sample => {
-                const imgDiv = document.createElement("div");
-                imgDiv.className = "detail-sample-img";
-                imgDiv.innerHTML = `<img src="data:image/jpeg;base64,${sample.image_base64}" alt="${cell.code}">`;
-                samplesGrid.appendChild(imgDiv);
-            });
+            if (data.samples && data.samples.length > 0) {
+                data.samples.forEach(sample => {
+                    const imgDiv = document.createElement("div");
+                    imgDiv.className = "detail-sample-img";
+                    imgDiv.title = `${cell.code} - ${sample.filename || ""}`;
+                    imgDiv.innerHTML = `<img src="data:image/jpeg;base64,${sample.image_base64}" alt="${cell.code}">`;
+                    samplesGrid.appendChild(imgDiv);
+                });
+            } else {
+                samplesGrid.innerHTML = '<p style="grid-column: 1/-1; color: var(--text-secondary); text-align: center; padding: 16px;">Chưa có ảnh mẫu cho loại tế bào này.</p>';
+            }
         } catch (err) {
-            samplesGrid.innerHTML = '<p class="text-danger">Không tải được ảnh mẫu.</p>';
+            samplesGrid.innerHTML = '<p class="text-danger" style="grid-column: 1/-1; text-align: center;">Không tải được ảnh mẫu.</p>';
         }
     }
 
