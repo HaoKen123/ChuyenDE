@@ -735,31 +735,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const btnRunXai = document.getElementById("btn-run-xai");
-    const btnRunXaiAll = document.getElementById("btn-run-xai-all");
+    const btnRunXaiAll = document.getElementById("btn-run-all-xai") || document.getElementById("btn-run-xai-all");
 
     if (btnRunXai) btnRunXai.addEventListener("click", () => renderXai(false));
     if (btnRunXaiAll) btnRunXaiAll.addEventListener("click", () => renderXai(true));
 
     async function renderXai(allMethods = false) {
         if (!xaiFile) {
-            alert("Vui lòng tải hoặc chọn ảnh mẫu để tạo giải thích XAI!");
+            alert("Vui lòng tải ảnh tế bào hoặc chọn một ảnh mẫu bên dưới để tạo giải thích XAI!");
             return;
         }
 
         const btn = allMethods ? btnRunXaiAll : btnRunXai;
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tính toán Heatmap...';
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tính toán Heatmap...';
+        }
 
         const grid = document.getElementById("xai-grid");
-        const sampleType = grid.dataset.sampleType;
-        const sampleFilename = grid.dataset.sampleFilename;
-        const method = document.getElementById("pipe-xai-method")?.value || "HiResCAM";
+        const methodSelect = document.getElementById("xai-method");
+        const method = methodSelect ? methodSelect.value : "HiResCAM";
+        const targetClassSelect = document.getElementById("xai-target-class");
+        const targetClass = targetClassSelect ? targetClassSelect.value : "auto";
 
         let url = allMethods ? `${API_BASE}/xai-all` : `${API_BASE}/xai`;
         const formData = new FormData();
-        formData.append("alpha", alphaSlider.value);
+        formData.append("alpha", alphaSlider ? alphaSlider.value : "0.5");
         formData.append("file", xaiFile, "cell.jpg");
-        if (!allMethods) formData.append("method", method);
+        if (targetClass && targetClass !== "auto") {
+            formData.append("target_class", targetClass);
+        }
+        if (!allMethods) {
+            formData.append("method", method);
+        }
 
         try {
             const res = await fetch(url, { method: "POST", body: formData });
@@ -770,7 +778,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (allMethods) {
                     const methods = ["HiResCAM", "XGradCAM", "EigenCAM", "IntegratedGradients"];
                     methods.forEach(m => {
-                        const result = data.results[m];
+                        const result = data.results ? data.results[m] : null;
+                        if (!result) return;
                         const card = document.createElement("div");
                         card.className = "xai-card";
                         card.innerHTML = `
@@ -794,14 +803,19 @@ document.addEventListener("DOMContentLoaded", () => {
                     `;
                 }
             } else {
-                alert("Có lỗi khi tạo XAI: " + data.error);
+                alert("Có lỗi khi tạo XAI: " + (data.error || data.detail || "Lỗi không xác định"));
             }
         } catch (err) {
             alert("Lỗi kết nối Backend.");
         } finally {
-            btn.disabled = false;
-            btnRunXai.innerHTML = '<i class="fa-solid fa-bolt"></i> Tạo Heatmap';
-            btnRunXaiAll.innerHTML = '<i class="fa-solid fa-grid-2"></i> So sánh 4 Methods';
+            if (btnRunXai) {
+                btnRunXai.disabled = false;
+                btnRunXai.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Tạo bản đồ giải thích';
+            }
+            if (btnRunXaiAll) {
+                btnRunXaiAll.disabled = false;
+                btnRunXaiAll.innerHTML = '<i class="fa-solid fa-layer-group"></i> So sánh tất cả phương pháp';
+            }
         }
     }
 

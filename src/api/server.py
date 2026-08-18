@@ -517,6 +517,7 @@ async def classify_sample(
 async def generate_xai(
     file: UploadFile = File(...),
     method: str = Form("HiResCAM"),
+    target_class: Optional[str] = Form(None),
     alpha: float = Form(0.5)
 ):
     """
@@ -525,7 +526,7 @@ async def generate_xai(
     try:
         contents = await file.read()
         engine = get_xai_engine()
-        result = engine.generate_explanation(contents, method=method, alpha=alpha)
+        result = engine.generate_explanation(contents, method=method, target_class=target_class, alpha=alpha)
 
         return {"success": True, **result}
     except Exception as e:
@@ -535,6 +536,7 @@ async def generate_xai(
 @app.post("/api/xai-all")
 async def generate_all_xai(
     file: UploadFile = File(...),
+    target_class: Optional[str] = Form(None),
     alpha: float = Form(0.5)
 ):
     """
@@ -543,7 +545,7 @@ async def generate_all_xai(
     try:
         contents = await file.read()
         engine = get_xai_engine()
-        results = engine.generate_all_explanations(contents, alpha=alpha)
+        results = engine.generate_all_explanations(contents, target_class=target_class, alpha=alpha)
 
         return {"success": True, "results": results}
     except Exception as e:
