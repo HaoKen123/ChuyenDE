@@ -55,7 +55,24 @@ xai_engine: Optional[XAIEngine] = None
 classifier_key: Optional[tuple[str, str, str]] = None
 classifier_lock = threading.RLock()
 
-DATASET_PATH = PROJECT_ROOT / "Dataset-Crop"
+
+def get_dataset_path() -> Path:
+    candidates = [
+        PROJECT_ROOT / "Dataset-Crop",
+        Path("D:/ChuyenDE-main/Dataset-Crop"),
+        Path("D:/ChuyenDE/Dataset-Crop"),
+        PROJECT_ROOT.parent / "ChuyenDE-main" / "Dataset-Crop",
+        PROJECT_ROOT.parent / "data" / "Dataset-Crop",
+    ]
+    for cand in candidates:
+        if cand.exists() and cand.is_dir():
+            return cand
+    return PROJECT_ROOT / "Dataset-Crop"
+
+
+DATASET_PATH = get_dataset_path()
+
+
 
 
 def get_detector(model_path=None):
