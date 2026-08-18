@@ -1,4 +1,4 @@
-# 🩸 HemoAI: Hệ Thống Phát Hiện & Phân Loại Tế Bào Máu Đa Mô Hình Kết Hợp XAI
+# Hệ Thống Phát Hiện & Phân Loại Tế Bào Máu Đa Mô Hình Kết Hợp XAI
 
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11%20%7C%203.12-blue.svg)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0%2B-ee4c2c.svg)](https://pytorch.org/)
