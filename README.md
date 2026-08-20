@@ -290,6 +290,6 @@ python training/training_yolo/train.py
 ---
 
 ## 👥 Tác Giả & Đóng Góp
-- **Sinh viên thực hiện**: Hồ Nhật Hào (23004023) & Nguyễn Quốc Huy
+- **Sinh viên thực hiện**: Hồ Nhật Hào (23004023) & Nguyễn Quốc Huy (23004050) & Nguyễn Quốc Vinh (23004008)
 - **Đề tài**: Nghiên cứu & Ứng dụng Vision-Language Models kết hợp XAI trong Phân tích Tế bào Máu Vi thể.
 - **Trường / Đơn vị**: Khoa Công nghệ Thông tin.
